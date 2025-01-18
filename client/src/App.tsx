@@ -14,6 +14,9 @@ import { useActivepath } from './hooks/useUpaths'
 import { HandlePath } from './functions/Handlepath'
 import { useUpaths } from "./hooks/useUpaths";
 
+
+
+
 export default function App() {
 
 
@@ -126,10 +129,11 @@ export default function App() {
 
           {Maindata.data.map(( value, index ) =>(
 
-            <button onClick={() => HandlePath(`${pathname}/${value}` , dispatch , paths)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
-                <img src="./icons/icons8-folder-48.png" width={20} height={20} alt="" />
-                <p className='text-slate-200'>{value}</p>
-
+            <button onClick={() => HandlePath(value["path"] , dispatch , paths)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
+                <img src={value["isdir"] ? "./icons/icons8-folder-48.png" : "./icons/icons8-documents-48.png"} width={20} height={20} alt="" />
+                <p className='text-slate-200'>{value["name"]}</p>
+                <p className='text-slate-500'>{value["size"]} bytes</p>
+         
             </button>
 
           ))}

@@ -88,11 +88,15 @@ class FIleExplorer:
         try:
 
             pathname = request.get_json()
-           
+            datatosend = []
             data = self.oslistdir(pathname["path"])
-          
+            for i in data:
+                 if os.path.isdir(f"{pathname["path"]}/{i}"):
+                        datatosend.append({ "isdir": True  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path": f"{pathname["path"]}/{i}"})
+                 else:
+                       datatosend.append({ "isdir": False  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path" : f"{pathname["path"]}/{i}"})
 
-            return jsonify(pathdata = data)
+            return jsonify(pathdata = datatosend)
         except :
             
             return jsonify(error="An error occured!")
