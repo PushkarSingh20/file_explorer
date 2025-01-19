@@ -95,6 +95,8 @@ const Aside = () => {
         if (paths[path_index]) {
 
             let response = await Datarequest("/getpath" , "POST" , {"path": paths[path_index]} )
+            console.log(response);
+            
             
             if (response.data.pathdata) {
                 dispatch(setdata(response.data.pathdata))
@@ -125,7 +127,7 @@ const Aside = () => {
                        {activepathindex !== 0 &&  <button onClick={() => HandleBackword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>}
                         
                         <button onClick={() => HandleForword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>
-
+                
 
 
                     </div> : <></>}

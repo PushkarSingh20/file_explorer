@@ -85,20 +85,22 @@ class FIleExplorer:
     
 
     def get_directory(self, request):
+        
         try:
 
             pathname = request.get_json()
             datatosend = []
-            print(pathname)
+        
             data = self.oslistdir(pathname["path"])
             for i in data:
                  if os.path.isdir(f"{pathname["path"]}/{i}"):
-                        datatosend.append({ "isdir": True  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path": f"{pathname["path"]}/{i}"})
+                        datatosend.append({ "isdir": True  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path": f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
                  else:
-                       datatosend.append({ "isdir": False  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path" : f"{pathname["path"]}/{i}"})
+                       datatosend.append({ "isdir": False  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
 
             return jsonify(pathdata = datatosend)
-        except :
+        except Exception as e:
+            print(e)
             return jsonify(error="An error occured!")
         
     def renamepath(self, request):

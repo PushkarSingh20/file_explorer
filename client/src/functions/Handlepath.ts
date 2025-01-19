@@ -40,6 +40,7 @@ export const HandlePath = async (
       dispatch(setactivepath(path));
       dispatch(setpaths([...paths, path]));
       dispatch(setactiveindex(Number(activepathindex) ))
+      
     } else {
       console.warn("No path data received from the server.");
     }

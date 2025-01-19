@@ -29,7 +29,47 @@ export default function App() {
   const { username: uservalue } = useUsername()
   const {pathname} = useActivepath()
 
+ 
 
+  let filesIcons =   {
+
+      ".rar":  "icons8-rar-48.png",
+      ".html":  "icons8-html-48.png",
+      ".css":  "icons8-css-48.png",
+      ".js":  "icons8-js-48.png",
+      ".python":  "icons8-python-48.png",
+      ".dll":  "icons8-dll-48.png",
+      ".pdf":  "icons8-pdf-48.png",
+      ".txt":  "icons8-txt-48.png",
+      ".xml":  "icons8-xml-48.png",
+      ".png":  "icons8-image-48.png",
+      ".gif":  "icons8-image-48.png",
+      ".mp4":  "icons8-video-file-48.png",
+      ".jpg":  "icons8-image-48.png",
+      ".mp3":  "icons8-mp3-48.png",
+      ".cpp":  "icons8-c-48.png",
+      ".msi":  "icons8-msi-64.png",
+      ".exe":  "icons8-exe-64.png",
+      ".ini":  "icons8-ini-47.png",
+      ".lnk":  "icons8-lnk-64.png",
+
+     
+    }
+
+  
+
+  function GiveFileIcon(fileext : keyof typeof filesIcons , isdir: Boolean){
+
+    let icon = filesIcons[fileext]
+
+    if (!isdir) {
+      
+      return <img src={(icon && `./icons/${filesIcons[fileext]}`) || "./icons/icons8-documents-48.png"} height={25} width={25} alt="" />
+
+    }
+
+   return <img src={`./icons/icons8-folder-48.png`} height={25} width={25} alt="" />
+  }
 
   useEffect(() => {
 
@@ -130,10 +170,14 @@ export default function App() {
           {Maindata.data.map(( value, index ) =>(
 
             <button onClick={() => HandlePath(value["path"] , dispatch , paths , paths.length )} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
-                <img src={value["isdir"] ? "./icons/icons8-folder-48.png" : "./icons/icons8-documents-48.png"} width={20} height={20} alt="" />
-                <p className='text-slate-200'>{value["name"]}</p>
+          
+              {GiveFileIcon(value["ext"] , value["isdir"])}
+
+
+
+                <p className='text-slate-200'>{value["name"] } </p>
                 <p className='text-slate-500'>{value["size"]} bytes</p>
-         
+
             </button>
 
           ))}
