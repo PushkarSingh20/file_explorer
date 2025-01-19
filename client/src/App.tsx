@@ -17,7 +17,7 @@ import { useGetdataMutation } from './redux/apis/basequeries'
 import { setdata } from './redux/Data/slice'
 import { setactiveindex } from './redux/upaths/slice'
 import { setactivepath } from './redux/upaths/activepath'
-
+import { setpaths } from './redux/upaths/slice'
 export default function App() {
 
 
@@ -138,8 +138,8 @@ export default function App() {
     if (response.data.pathdata) {
 
       dispatch(setdata(response.data.pathdata))
-
-       dispatch(setactivepath(pathname))
+      dispatch(setpaths([...paths , pathname ]))
+      dispatch(setactivepath(pathname))
       dispatch(setactiveindex(activepathindex + 1))
     }
     else {
