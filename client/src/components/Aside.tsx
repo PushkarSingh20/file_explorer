@@ -6,15 +6,30 @@ import { useUsername } from '../hooks/useUsername'
 import Loading from "./Loading";
 import { useDispatch } from "react-redux";
 import { useUpaths } from "../hooks/useUpaths";
-
+import { HomeSharp } from "@mui/icons-material";
 import { ThunkDispatch } from "@reduxjs/toolkit";
+import { setactivepath } from "../redux/upaths/activepath";
+import { setactiveindex } from "../redux/upaths/slice";
+import { useGetdataMutation } from "../redux/apis/basequeries";
+import { setdata } from "../redux/Data/slice";
+
 
 const Aside = () => {
     const { username } = useUsername()
-    const {paths} = useUpaths()
-    
-    const dispatch = useDispatch<ThunkDispatch <any, any, any>>()
+    const { paths , activepathindex} = useUpaths()
+    const [GetdataMutation] = useGetdataMutation()
+    const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
+
+    async function Datarequest(path : string, method: string, data: Object){
+
+
+      const response =  await GetdataMutation({ path , method,  data})
+
+      return response
+
+
+    }
 
     let Basepath = `C:/users/${username}`
 
@@ -51,24 +66,73 @@ const Aside = () => {
         }
     ]
 
+    const HandleBackword = async () => {
+        
+        let path_index = activepathindex -1
+    
+        if (paths[path_index]) {
+            
+            let response = await Datarequest("/getpath" , "POST" , {"path": paths[path_index]} )
+            if (response.data.pathdata) {
+                dispatch(setdata(response.data.pathdata))
+            }   
+            else{
+                console.error("An error occured!");
+                
+            }
 
-   
+            dispatch(setactivepath(paths[path_index]))
+            dispatch(setactiveindex(path_index)) 
+        }
+    
+
+    }
+
+    const HandleForword = async () => {
+
+        let path_index = activepathindex + 1
+
+        if (paths[path_index]) {
+
+            let response = await Datarequest("/getpath" , "POST" , {"path": paths[path_index]} )
+            
+            if (response.data.pathdata) {
+                dispatch(setdata(response.data.pathdata))
+            }   
+            else{
+                console.error("An error occured!");
+                
+            }
+            dispatch(setactivepath(paths[path_index]))
+            dispatch(setactiveindex(path_index))
+
+        }
+    
+    }
+
+
 
     return (
 
         <aside className='Scroller w-[20%] h-full bg-black p-[20px] gap-[20px] flex flex-col  overflow-y-auto'>
-          {username.trim() !== "" ?   <>
-                <div className='flex text-white items-center gap-[20px] justify-end'>
-
-                    <button className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>
-                    <button className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>
+            {username.trim() !== "" ? <>
 
 
+                <div className="flex w-full items-center justify-between">
+                    <button onClick={() => dispatch(setactivepath("this pc"))}><HomeSharp className="text-white" /></button>
+               {paths.length > 1 ? <div className='flex text-white items-center gap-[20px] justify-end'>
 
+                       {activepathindex !== 0 &&  <button onClick={() => HandleBackword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>}
+                        
+                        <button onClick={() => HandleForword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>
+
+
+
+                    </div> : <></>}
                 </div>
 
                 {BasicFiles.map((value, index) => {
-                    return <motion.button onClick={() => HandlePath(value.path , dispatch , paths)} whileHover={{
+                    return <motion.button onClick={() => HandlePath(value.path, dispatch, paths , activepathindex + 1)} whileHover={{
                         scale: 1.1,
                         transition: { duration: 0.2, ease: 'easeInOut' }
                     }} key={index} className=" text-white text-[12px] flex items-center w-full w-full gap-[20px]">
@@ -77,7 +141,7 @@ const Aside = () => {
                     </motion.button>
                 })}
             </>
-            : <Loading/>
+                : <Loading />
             }
 
         </aside>

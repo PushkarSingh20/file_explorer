@@ -8,7 +8,7 @@ import { ApiThunkFunc } from './redux/apis/api'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useMainData } from './hooks/useMaindata'
 import { useUsername } from './hooks/useUsername'
-import { useGetUsernamedataQuery } from "./redux/apis/basequeries";
+import { useGetBaseQueryQuery } from "./redux/apis/basequeries";
 import { setname } from './redux/user/slice'
 import { useActivepath } from './hooks/useUpaths'
 import { HandlePath } from './functions/Handlepath'
@@ -21,9 +21,9 @@ export default function App() {
 
 
   const [Data, setData] = useState([])
-  const {paths} = useUpaths()
+  const {paths } = useUpaths()
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
-  const { data: username, isLoading: loadingusername, error: usernameerror } = useGetUsernamedataQuery("/getuser")
+  const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   const Maindata = useMainData()
   const { username: uservalue } = useUsername()
@@ -37,7 +37,7 @@ export default function App() {
         
         dispatch(ApiThunkFunc("/getdata"))
     }
-
+  
     if (!uservalue) {
       if (!loadingusername && !usernameerror) {
         dispatch(setname(username?.username))
@@ -129,7 +129,7 @@ export default function App() {
 
           {Maindata.data.map(( value, index ) =>(
 
-            <button onClick={() => HandlePath(value["path"] , dispatch , paths)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
+            <button onClick={() => HandlePath(value["path"] , dispatch , paths , paths.length )} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
                 <img src={value["isdir"] ? "./icons/icons8-folder-48.png" : "./icons/icons8-documents-48.png"} width={20} height={20} alt="" />
                 <p className='text-slate-200'>{value["name"]}</p>
                 <p className='text-slate-500'>{value["size"]} bytes</p>

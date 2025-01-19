@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 import { setactivepath } from "../redux/upaths/activepath";
 import { setdata } from "../redux/Data/slice";
-import { setpaths } from "../redux/upaths/slice";
+import { setpaths , setactiveindex } from "../redux/upaths/slice";
 
 
 
@@ -9,7 +9,8 @@ import { setpaths } from "../redux/upaths/slice";
 export const HandlePath = async (
   path: string,
   dispatch: Dispatch,
-  paths: string[]
+  paths: string[],
+  activepathindex: Number
 ) => {
 
   if (path.toLowerCase() === "this pc") {
@@ -38,6 +39,7 @@ export const HandlePath = async (
       dispatch(setdata(data.pathdata));
       dispatch(setactivepath(path));
       dispatch(setpaths([...paths, path]));
+      dispatch(setactiveindex(Number(activepathindex) ))
     } else {
       console.warn("No path data received from the server.");
     }

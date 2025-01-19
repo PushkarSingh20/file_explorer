@@ -20,7 +20,7 @@ def get_data():
 @app.route('/getpath' , methods=["POST"])
 def getpath():
     return FileExp.get_directory(request)
-
+    
 
 @app.route("/rename" , methods=["PATCH"])
 def Renamepath():

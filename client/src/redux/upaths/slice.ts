@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 let initialState = {
-    paths: []
+    paths: ["this pc"],
+    activepathindex:0
 }
 
 const upaths = createSlice({
@@ -12,11 +13,18 @@ const upaths = createSlice({
     reducers: {
         setpaths : (state, action) => {
             state.paths = action.payload
-        }   
+           
+        },   
+
+        setactiveindex : (state, action) => {
+            state.activepathindex = action.payload
+           
+        } 
+
     }
 
 })
 
 
-export const {setpaths} = upaths.actions
+export const {setpaths , setactiveindex} = upaths.actions
 export default upaths.reducer
