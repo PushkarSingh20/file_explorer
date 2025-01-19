@@ -126,9 +126,8 @@ const Aside = () => {
 
                        {activepathindex !== 0 &&  <button onClick={() => HandleBackword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>}
                         
-                        <button onClick={() => HandleForword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>
-                
-
+                        {activepathindex !== paths.length - 1 && <button onClick={() => HandleForword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>}
+                        
 
                     </div> : <></>}
                 </div>

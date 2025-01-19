@@ -85,12 +85,12 @@ class FIleExplorer:
     
 
     def get_directory(self, request):
-        
+
         try:
 
             pathname = request.get_json()
             datatosend = []
-        
+            print(pathname)
             data = self.oslistdir(pathname["path"])
             for i in data:
                  if os.path.isdir(f"{pathname["path"]}/{i}"):
