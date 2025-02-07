@@ -20,6 +20,9 @@ import { setactivepath } from './redux/upaths/activepath'
 import { setpaths } from './redux/upaths/slice'
 import { setSelectedFiles } from './redux/selected/slice'
 import { useSeletedFiles } from './hooks/useSelectedFiles'
+import { Operations } from './components/Operations'
+
+
 
 export default function App() {
 
@@ -203,13 +206,15 @@ export default function App() {
 
     <Layout>
 
-      <div className='flex flex-col gap-[10px]'>
+      <div className='flex flex-col gap-[10px] w-full'>
 
     
-        <div className='flex w-full items-center justify-between'>
+        <div className=' w-full flex items-center justify-between'>
 
           <p className='p-[20px] text-white'>{pathname}</p>
 
+        <Operations pathname={pathname} selectedfiles={selectedfiles}/>
+    
 
         </div>
         {pathname.toLowerCase() === "this pc" ? <>

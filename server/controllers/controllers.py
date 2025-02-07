@@ -4,13 +4,11 @@ import shutil
 import psutil
 from cryptography.fernet import Fernet
 from concurrent.futures import ThreadPoolExecutor
-import ctypes
 
 class FIleExplorer:
 
     def __init__(self):
         self.partitions  =  psutil.disk_partitions()
-
 
     def GenerateFilekey(self):
          
@@ -82,8 +80,7 @@ class FIleExplorer:
     
     def getUser(self):
          return jsonify(username=os.getlogin())
-    
-        
+          
     def get_directory(self, request):
 
         try:
@@ -98,10 +95,10 @@ class FIleExplorer:
                  else:
                        datatosend.append({ "isdir": False  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
 
-            return jsonify(pathdata = datatosend)
-        except Exception as e:
-            print(e)
-            return jsonify(error="An error occured!")
+            return jsonify(pathdata = datatosend , success= True)
+        except :
+            
+            return jsonify(error="An error occured!" ,  success= False)
         
     def renamepath(self, request):
         try: 
@@ -114,16 +111,7 @@ class FIleExplorer:
             return jsonify(message=f"Renamed {full_existing} to {full_new}")
         except:
             return jsonify(error="An error occured!")
-        
-    def deleteFile(self, request):
-            data = request.get_json()
-            try:
-                full_existing = data["fullpath"] + data["name"]  
-                os.remove(full_existing)
-                return jsonify(message=f"Deleted file {full_existing}")
-            except:
-                return jsonify(error=f"the file is invailid {full_existing}")
-            
+           
     def copyFile(self, request):
             try:
                 data = request.get_json()
@@ -149,16 +137,18 @@ class FIleExplorer:
                 print(e)
                 return jsonify(error="An error occured!")
     
-    def multiDel(self, request):
+    def Del(self, request):
             try:
                 data = request.get_json()
+               
                 for i in data["files"]:
-                    pathname = data["fullpath"] +  i
-                    shutil.rmtree(pathname)
-                return jsonify(message=f"All files are deleted.")
+                    if os.path.isdir(i):
+                        shutil.rmtree(i)
+                    else:
+                            os.remove(i)
+                return jsonify(message=f"All files are deleted." , success=True)
             except :
-                  
-                return jsonify(error= "An error occured")
+                return jsonify(error= "An error occured" , success=False)
             
     def multiMove(self, request):
             try:

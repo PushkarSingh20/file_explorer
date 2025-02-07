@@ -27,9 +27,7 @@ def Renamepath():
     return FileExp.renamepath(request)
 
 
-@app.route('/delete' , methods=["DELETE"])
-def delete():
-    return FileExp.deleteFile(request)
+
     
 
 @app.route('/copy' , methods=["PUT"])
@@ -40,9 +38,9 @@ def copy():
 def move():
     return FileExp.moveFile(request)
  
-@app.route('/multi_del' , methods=["DELETE"])
-def multi_del():
-    return FileExp.multiDel(request)
+@app.route('/delete' , methods=["DELETE"])
+def delete():
+    return FileExp.Del(request)
 
 
 @app.route('/multi_copy' , methods=["PUT"])

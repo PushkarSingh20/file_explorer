@@ -23,3 +23,8 @@
 .Scroller::-webkit-scrollbar{
     display: none;
 }
+.opbtns {
+    @apply    w-[30px] h-[30px] rounded-full flex items-center justify-center
+
+   }
+

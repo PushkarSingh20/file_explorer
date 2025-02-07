@@ -35,7 +35,7 @@ export const HandlePath = async (
     const data = await response.json();
 
     if (data?.pathdata) {
-   
+      
       dispatch(setdata(data.pathdata));
       dispatch(setactivepath(path));
       dispatch(setpaths([...paths, path]));
