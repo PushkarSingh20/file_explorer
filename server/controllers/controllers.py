@@ -83,7 +83,7 @@ class FIleExplorer:
     def getUser(self):
          return jsonify(username=os.getlogin())
     
-
+        
     def get_directory(self, request):
 
         try:
@@ -131,7 +131,7 @@ class FIleExplorer:
                 destination_path = data["endpath"]
                
                 shutil.copy(full_existing, destination_path)
-
+                
                 return jsonify(message=f"{full_existing} copied to {destination_path}")
             
             except Exception as e:
@@ -174,20 +174,17 @@ class FIleExplorer:
     def multiCopy(self, request):
             try:
 
-                def is_admin():
-                    try:
-                        return ctypes.windll.shell32.IsUserAnAdmin()
-                    except:
-                        return False
-
-                if not is_admin():
-                    return jsonify(error="Script must be run as an administrator")
-
                 data = request.get_json()
+             
                 for i in data["files"]:
                     pathname = data["fullpath"] +  i
                     os.chmod(pathname, 0o666)
-                    shutil.copy(pathname, data["destination"])
+
+                    if os.path.isdir(pathname):
+                         shutil.copytree(pathname,  data["destination"])
+                    else:
+                         
+                        shutil.copy(pathname, data["destination"])
                 return jsonify(message="copyed successfully!")
             except Exception as e:
                 print(e)

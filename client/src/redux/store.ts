@@ -4,6 +4,9 @@ import UserSlice from './user/slice'
 import Basequeries from './apis/basequeries'
 import upaths from './upaths/slice'
 import activepath from './upaths/activepath'
+import  SliceSelected  from './selected/slice'
+
+
 
 export const store = configureStore({
 
@@ -13,6 +16,8 @@ export const store = configureStore({
         UserSlice: UserSlice,
         upaths: upaths,
         activepath: activepath,
+        SliceSelected: SliceSelected,
+        
         [Basequeries.reducerPath] : Basequeries.reducer
     },
     middleware: (getDefaultMiddleware) => 

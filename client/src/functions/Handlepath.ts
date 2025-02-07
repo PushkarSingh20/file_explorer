@@ -14,7 +14,7 @@ export const HandlePath = async (
 ) => {
 
   if (path.toLowerCase() === "this pc") {
-    console.warn('Skipping "This PC" path.');
+  
     return;
   }
 

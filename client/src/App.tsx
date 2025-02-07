@@ -18,12 +18,16 @@ import { setdata } from './redux/Data/slice'
 import { setactiveindex } from './redux/upaths/slice'
 import { setactivepath } from './redux/upaths/activepath'
 import { setpaths } from './redux/upaths/slice'
+import { setSelectedFiles } from './redux/selected/slice'
+import { useSeletedFiles } from './hooks/useSelectedFiles'
+
 export default function App() {
 
 
   const [Data, setData] = useState([])
   const { paths , activepathindex } = useUpaths()
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
+  const {selectedfiles} = useSeletedFiles()
   const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   const Maindata = useMainData()
@@ -31,6 +35,17 @@ export default function App() {
   const { pathname } = useActivepath()
   const [GetdataMutation] = useGetdataMutation()
 
+
+
+
+  interface filesProps  {
+
+    partition_name: string,
+    total : number,
+    used : number, 
+    free : number, 
+
+  }
 
   let filesIcons = {
 
@@ -57,8 +72,6 @@ export default function App() {
 
   }
 
-
-
   function GiveFileIcon(fileext: keyof typeof filesIcons, isdir: Boolean) {
 
     let icon = filesIcons[fileext]
@@ -72,6 +85,18 @@ export default function App() {
     return <img src={`./icons/icons8-folder-48.png`} height={25} width={25} alt="" />
 
   }
+
+
+
+  useEffect(() => {
+
+    if (pathname) {
+        dispatch(setSelectedFiles([]))
+        
+    }
+
+      
+  } , [pathname , dispatch ]) 
 
   useEffect(() => {
 
@@ -148,25 +173,56 @@ export default function App() {
     }
   }
 
+  const HandleSelectedFiles = (value: { path: string }) => {
+  
+      let files:string[] = [...selectedfiles];
+    
+      
+      if (!files.includes(value.path)) {
+        files.push((value as { path: string }).path);  
+        dispatch(setSelectedFiles(files))
+      
+        
+      }
+  } 
+
+  const HandleIsChecked = (value : string) => {
+    let files:string[] = [...selectedfiles];
+    
+    if (files.includes(value)) {
+       let filtered = files.filter((e) => e !== value)
+       dispatch(setSelectedFiles(filtered))
+      
+
+    }
+
+
+  }
+
   return (
 
     <Layout>
 
       <div className='flex flex-col gap-[10px]'>
-        <p className='p-[20px] text-white'>{pathname}</p>
+
+    
+        <div className='flex w-full items-center justify-between'>
+
+          <p className='p-[20px] text-white'>{pathname}</p>
+
+
+        </div>
         {pathname.toLowerCase() === "this pc" ? <>
           {Data.length > 0 ? <div className='flex  gap-[20px] p-[20px]'>
 
 
-
-            {Data.map((value, index) => {
-              return <button key={index} onClick={() => Handledrive(value["partition_name"])} className='flex hover:bg-gray-900 flex-col justify-center gap-[10px] bg-black p-[20px] w-[500px] rounded-lg h-[150px] rounded-lg items-start'>
+            {Data.map((value : filesProps, index) => {
+              return <button key={index} onClick={() => Handledrive(value.partition_name)} className='flex hover:bg-gray-900 flex-col justify-center gap-[10px] bg-black p-[20px] w-[500px] rounded-lg h-[150px] rounded-lg items-start'>
 
                 <div className='text-white flex w-full items-center gap-[20px]'>
                   <img src="./icons/icons8-ssd-48.png" alt="Loading" />
 
                   <p>{value["partition_name"]}</p>
-
 
 
                 </div>
@@ -184,9 +240,9 @@ export default function App() {
 
 
                 <div className='flex gap-[20px] text-white w-full items-center'>
-                  <p><span className='text-green-500'>Total</span> {Math.floor(value["total"])}GB</p>
-                  <p><span className='text-red-500'>Used</span> {Math.floor(value["used"])}GB</p>
-                  <p><span className='text-yellow-500'>Free</span> {Math.floor(value["free"])}GB</p>
+                  <p><span className='text-green-500'>Total</span> {Math.floor(value.total)}GB</p>
+                  <p><span className='text-red-500'>Used</span> {Math.floor(value.used)}GB</p>
+                  <p><span className='text-yellow-500'>Free</span> {Math.floor(value.free)}GB</p>
                 </div>
 
               </button>
@@ -197,12 +253,13 @@ export default function App() {
 
           }
 
-        </> : <div className='Scroller flex h-full overflow-y-auto  text-white flex-col gap-[15px]'>
+        </> : <div className='Scroller flex h-full overflow-y-auto p-[10px] text-white flex-col gap-[15px]'>
 
-          {Maindata.data.map((value, index) => (
-
-            <button onClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
-
+          {Maindata.data.map((value , index) => (
+            <div key={index} className='flex items-center '>
+            {selectedfiles.includes(value["path"]) &&  <input type="checkbox"   onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' /> }
+            <button onClick={() => HandleSelectedFiles(value) } onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
+              
               {GiveFileIcon(value["ext"], value["isdir"])}
 
 
@@ -211,6 +268,7 @@ export default function App() {
               <p className='text-slate-500'>{value["size"]} bytes</p>
 
             </button>
+            </div>
 
           ))}
 

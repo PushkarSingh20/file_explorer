@@ -95,7 +95,6 @@ const Aside = () => {
         if (paths[path_index]) {
 
             let response = await Datarequest("/getpath" , "POST" , {"path": paths[path_index]} )
-            console.log(response);
             
             
             if (response.data.pathdata) {
@@ -128,7 +127,7 @@ const Aside = () => {
                         
                         {activepathindex !== paths.length - 1 && <button onClick={() => HandleForword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>}
                         
-
+                        
                     </div> : <></>}
                 </div>
 
