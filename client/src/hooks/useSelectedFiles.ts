@@ -7,7 +7,7 @@ export const useSeletedFiles = () => {
 
     const {files : selectedfiles} = useSelector((state : RootState) => state.SliceSelected )
 
-    return {selectedfiles}
+    return {selectedfiles }
 
     
 }

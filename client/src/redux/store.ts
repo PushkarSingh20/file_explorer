@@ -5,6 +5,8 @@ import Basequeries from './apis/basequeries'
 import upaths from './upaths/slice'
 import activepath from './upaths/activepath'
 import  SliceSelected  from './selected/slice'
+import ErrorSlice from './Errors/slice'
+import MessageSlice from './Message/slice'
 
 
 
@@ -17,8 +19,10 @@ export const store = configureStore({
         upaths: upaths,
         activepath: activepath,
         SliceSelected: SliceSelected,
-        
+        ErrorSlice : ErrorSlice,
+        MessageSlice: MessageSlice,
         [Basequeries.reducerPath] : Basequeries.reducer
+        
     },
     middleware: (getDefaultMiddleware) => 
         getDefaultMiddleware().concat(Basequeries.middleware)

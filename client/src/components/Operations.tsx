@@ -5,15 +5,19 @@ import { setdata } from '../redux/Data/slice';
 import { useDispatch } from 'react-redux';
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import { setSelectedFiles } from '../redux/selected/slice';
+import { setError } from '../redux/Errors/slice';
+import { setMessage } from '../redux/Message/slice';
 
 interface Propdata {
 
     selectedfiles: string[],
     pathname: string,
+
+
 }
 
 
-export const Operations: FC<Propdata> = ({ selectedfiles , pathname }): JSX.Element => {
+export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Element => {
 
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
     const [Form_Mutation] = useGetdataMutation();
@@ -28,8 +32,10 @@ export const Operations: FC<Propdata> = ({ selectedfiles , pathname }): JSX.Elem
 
             if (!response.data.success) {
 
-                console.error("Failed to delete!")
-
+                dispatch(setError("Failed to delete!"))
+                setTimeout(() => {
+                    dispatch(setError(""))
+                } , 3000)
                 return
             }
             else{
@@ -38,23 +44,19 @@ export const Operations: FC<Propdata> = ({ selectedfiles , pathname }): JSX.Elem
                     if (response.data.success) {
                         dispatch(setSelectedFiles([]))
                         dispatch(setdata(response.data.pathdata))
-
+                        dispatch(setMessage("Delated!"))
+                        setTimeout(() => {
+                           dispatch(setMessage(""))
+                        } , 3000)
                     }
                     else{
-                        console.error("An error occured!")
+                        dispatch(setError("An error occured!"))
+                       
                         return
                     }
 
 
             }
-
-
-
-
-            
-
-            
-
 
     }
 

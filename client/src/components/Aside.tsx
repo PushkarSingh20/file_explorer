@@ -12,21 +12,23 @@ import { setactivepath } from "../redux/upaths/activepath";
 import { setactiveindex } from "../redux/upaths/slice";
 import { useGetdataMutation } from "../redux/apis/basequeries";
 import { setdata } from "../redux/Data/slice";
+import { setError } from "../redux/Errors/slice";
+
 
 
 const Aside = () => {
+
     const { username } = useUsername()
-    const { paths , activepathindex} = useUpaths()
+    const { paths, activepathindex } = useUpaths()
     const [GetdataMutation] = useGetdataMutation()
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
+    async function Datarequest(path: string, method: string, data: Object) {
 
-    async function Datarequest(path : string, method: string, data: Object){
 
+        const response = await GetdataMutation({ path, method, data })
 
-      const response =  await GetdataMutation({ path , method,  data})
-
-      return response
+        return response
 
 
     }
@@ -67,24 +69,33 @@ const Aside = () => {
     ]
 
     const HandleBackword = async () => {
-        
-        let path_index = activepathindex -1
-    
+
+        let path_index = activepathindex - 1
+
         if (paths[path_index]) {
-            
-            let response = await Datarequest("/getpath" , "POST" , {"path": paths[path_index]} )
-            if (response.data.pathdata) {
-                dispatch(setdata(response.data.pathdata))
-            }   
-            else{
-                console.error("An error occured!");
-                
+
+
+            if (paths[path_index] !== "this pc") {
+                let response = await Datarequest("/getpath", "POST", { "path": paths[path_index] })
+                if (response.data.success) {
+                    dispatch(setdata(response.data.pathdata))
+
+                }
+                else {
+                    dispatch(setError("An error occured!"));
+
+                    setTimeout(() => {
+                        dispatch(setError(""))
+                    }, 3000)
+
+                }
             }
 
+
             dispatch(setactivepath(paths[path_index]))
-            dispatch(setactiveindex(path_index)) 
+            dispatch(setactiveindex(path_index))
         }
-    
+
 
     }
 
@@ -94,24 +105,30 @@ const Aside = () => {
 
         if (paths[path_index]) {
 
-            let response = await Datarequest("/getpath" , "POST" , {"path": paths[path_index]} )
-            
-            
-            if (response.data.pathdata) {
-                dispatch(setdata(response.data.pathdata))
-            }   
-            else{
-                console.error("An error occured!");
-                
+            if (paths[path_index] !== "this pc") {
+                let response = await Datarequest("/getpath", "POST", { "path": paths[path_index] })
+
+
+
+                if (response.data.success) {
+                    dispatch(setdata(response.data.pathdata))
+                }
+                else {
+                    dispatch(setError("An error occured!"));
+
+                    setTimeout(() => {
+                        dispatch(setError(""))
+                    }, 3000)
+
+                }
             }
+
             dispatch(setactivepath(paths[path_index]))
             dispatch(setactiveindex(path_index))
 
         }
-    
+
     }
-
-
 
     return (
 
@@ -121,18 +138,18 @@ const Aside = () => {
 
                 <div className="flex w-full items-center justify-between">
                     <button onClick={() => dispatch(setactivepath("this pc"))}><HomeSharp className="text-white" /></button>
-               {paths.length > 1 ? <div className='flex text-white items-center gap-[20px] justify-end'>
+                    {paths.length > 1 ? <div className='flex text-white items-center gap-[20px] justify-end'>
 
-                       {activepathindex !== 0 &&  <button onClick={() => HandleBackword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>}
-                        
+                        {activepathindex !== 0 && <button onClick={() => HandleBackword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>}
+
                         {activepathindex !== paths.length - 1 && <button onClick={() => HandleForword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowForwardIosOutlinedIcon sx={{ fontSize: 13 }} /></button>}
-                        
-                        
+
+
                     </div> : <></>}
                 </div>
 
                 {BasicFiles.map((value, index) => {
-                    return <motion.button onClick={() => HandlePath(value.path, dispatch, paths , activepathindex + 1)} whileHover={{
+                    return <motion.button onClick={() => HandlePath(value.path, dispatch, paths, activepathindex + 1)} whileHover={{
                         scale: 1.1,
                         transition: { duration: 0.2, ease: 'easeInOut' }
                     }} key={index} className=" text-white text-[12px] flex items-center w-full w-full gap-[20px]">

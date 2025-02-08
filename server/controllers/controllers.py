@@ -87,17 +87,16 @@ class FIleExplorer:
 
             pathname = request.get_json()
             datatosend = []
-            print(pathname)
+
             data = self.oslistdir(pathname["path"])
             for i in data:
                  if os.path.isdir(f"{pathname["path"]}/{i}"):
                         datatosend.append({ "isdir": True  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path": f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
                  else:
                        datatosend.append({ "isdir": False  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
-
+            
             return jsonify(pathdata = datatosend , success= True)
         except :
-            
             return jsonify(error="An error occured!" ,  success= False)
         
     def renamepath(self, request):
@@ -122,8 +121,7 @@ class FIleExplorer:
                 
                 return jsonify(message=f"{full_existing} copied to {destination_path}")
             
-            except Exception as e:
-                print(e)
+            except :
                 return jsonify(error="An error occured!")
             
     def moveFile(self, request):
@@ -214,7 +212,6 @@ class FIleExplorer:
             return jsonify(data=findings)
         except:
             return jsonify(error="An error occured")
-
 
     def encryptFiles(self, request):
 

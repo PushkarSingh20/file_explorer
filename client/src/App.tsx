@@ -22,31 +22,42 @@ import { setSelectedFiles } from './redux/selected/slice'
 import { useSeletedFiles } from './hooks/useSelectedFiles'
 import { Operations } from './components/Operations'
 
+import { setError } from './redux/Errors/slice'
+
+import { useError } from './hooks/useError'
+import { useMessage } from './hooks/useMessage'
 
 
 export default function App() {
 
 
   const [Data, setData] = useState([])
-  const { paths , activepathindex } = useUpaths()
+  const { paths, activepathindex } = useUpaths()
+
+  const {error: Error} = useError();
+  const {message: Message} = useMessage();
+
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
-  const {selectedfiles} = useSeletedFiles()
+  const { selectedfiles } = useSeletedFiles()
+
   const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
+
   const Maindata = useMainData()
   const { username: uservalue } = useUsername()
+
   const { pathname } = useActivepath()
   const [GetdataMutation] = useGetdataMutation()
 
 
 
 
-  interface filesProps  {
+  interface filesProps {
 
     partition_name: string,
-    total : number,
-    used : number, 
-    free : number, 
+    total: number,
+    used: number,
+    free: number,
 
   }
 
@@ -90,16 +101,15 @@ export default function App() {
   }
 
 
-
   useEffect(() => {
 
     if (pathname) {
-        dispatch(setSelectedFiles([]))
-        
+      dispatch(setSelectedFiles([]))
+
     }
 
-      
-  } , [pathname , dispatch ]) 
+
+  }, [pathname, dispatch])
 
   useEffect(() => {
 
@@ -136,7 +146,8 @@ export default function App() {
 
 
       if (Maindata.error) {
-        console.error(Maindata?.error)
+        dispatch(setError("An error occured!"))
+        
       }
 
 
@@ -144,9 +155,9 @@ export default function App() {
 
 
 
-  }, [Maindata, pathname])
+  }, [Maindata, pathname , dispatch])
 
-
+  
   async function Datarequest(path: string, method: string, data: Object) {
 
 
@@ -159,43 +170,46 @@ export default function App() {
 
   const Handledrive = async (path: string) => {
     let pathname = path.replace(/\\/g, "/")
-   
-    let response = await Datarequest("/getpath", "POST", {"path" : pathname})
-    
+
+    let response = await Datarequest("/getpath", "POST", { "path": pathname })
+
 
     if (response.data.pathdata) {
 
       dispatch(setdata(response.data.pathdata))
-      dispatch(setpaths([...paths , pathname ]))
+      dispatch(setpaths([...paths, pathname]))
       dispatch(setactivepath(pathname))
       dispatch(setactiveindex(activepathindex + 1))
     }
     else {
-      console.error("An error occured!");
+      setError("An error occured!")
+      setTimeout(() => {
+        setError("")
+      }, 3000)
 
     }
   }
 
   const HandleSelectedFiles = (value: { path: string }) => {
-  
-      let files:string[] = [...selectedfiles];
-    
-      
-      if (!files.includes(value.path)) {
-        files.push((value as { path: string }).path);  
-        dispatch(setSelectedFiles(files))
-      
-        
-      }
-  } 
 
-  const HandleIsChecked = (value : string) => {
-    let files:string[] = [...selectedfiles];
-    
+    let files: string[] = [...selectedfiles];
+
+
+    if (!files.includes(value.path)) {
+      files.push((value as { path: string }).path);
+      dispatch(setSelectedFiles(files))
+
+
+    }
+  }
+
+  const HandleIsChecked = (value: string) => {
+    let files: string[] = [...selectedfiles];
+
     if (files.includes(value)) {
-       let filtered = files.filter((e) => e !== value)
-       dispatch(setSelectedFiles(filtered))
-      
+      let filtered = files.filter((e) => e !== value)
+      dispatch(setSelectedFiles(filtered))
+
 
     }
 
@@ -208,20 +222,28 @@ export default function App() {
 
       <div className='flex flex-col gap-[10px] w-full'>
 
-    
+
         <div className=' w-full flex items-center justify-between'>
 
           <p className='p-[20px] text-white'>{pathname}</p>
 
-        <Operations pathname={pathname} selectedfiles={selectedfiles}/>
-    
+          <Operations pathname={pathname} selectedfiles={selectedfiles} />
+
 
         </div>
+
+        {Error.trim() !== "" && <div className='flex items-center justify-center   text-white w-full'>
+          <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-red-500'>{Error}</p>
+        </div>}
+        {Message.trim() !== "" && <div className='flex items-center justify-center  text-white w-full'>
+          <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-green-500'>{Message}</p>
+        </div>}
+
         {pathname.toLowerCase() === "this pc" ? <>
           {Data.length > 0 ? <div className='flex  gap-[20px] p-[20px]'>
 
 
-            {Data.map((value : filesProps, index) => {
+            {Data.map((value: filesProps, index) => {
               return <button key={index} onClick={() => Handledrive(value.partition_name)} className='flex hover:bg-gray-900 flex-col justify-center gap-[10px] bg-black p-[20px] w-[500px] rounded-lg h-[150px] rounded-lg items-start'>
 
                 <div className='text-white flex w-full items-center gap-[20px]'>
@@ -260,19 +282,19 @@ export default function App() {
 
         </> : <div className='Scroller flex h-full overflow-y-auto p-[10px] text-white flex-col gap-[15px]'>
 
-          {Maindata.data.map((value , index) => (
+          {Maindata.data.map((value, index) => (
+
             <div key={index} className='flex items-center '>
-            {selectedfiles.includes(value["path"]) &&  <input type="checkbox"   onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' /> }
-            <button onClick={() => HandleSelectedFiles(value) } onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
-              
-              {GiveFileIcon(value["ext"], value["isdir"])}
+              {selectedfiles.includes(value["path"]) && <input type="checkbox" onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' />}
 
+              <button onClick={() => HandleSelectedFiles(value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
 
+                {GiveFileIcon(value["ext"], value["isdir"])}
 
-              <p className='text-slate-200'>{value["name"]} </p>
-              <p className='text-slate-500'>{value["size"]} bytes</p>
+                <p className='text-slate-200'>{value["name"]} </p>
+                <p className='text-slate-500'>{value["size"]} bytes</p>
 
-            </button>
+              </button>
             </div>
 
           ))}
