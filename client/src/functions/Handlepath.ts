@@ -37,7 +37,7 @@ export const HandlePath = async (
     if (data?.pathdata) {
       
       dispatch(setdata(data.pathdata));
-      dispatch(setactivepath(path));
+      dispatch(setactivepath(!path.endsWith("/") ? path + "/" : path));
       dispatch(setpaths([...paths, path]));
       dispatch(setactiveindex(Number(activepathindex) ))
       

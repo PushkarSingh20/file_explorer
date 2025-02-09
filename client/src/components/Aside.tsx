@@ -1,6 +1,7 @@
 import { motion } from "motion/react"
 import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
+import { RefreshOutlined } from "@mui/icons-material";
 import { HandlePath } from "../functions/Handlepath";
 import { useUsername } from '../hooks/useUsername'
 import Loading from "./Loading";
@@ -13,14 +14,15 @@ import { setactiveindex } from "../redux/upaths/slice";
 import { useGetdataMutation } from "../redux/apis/basequeries";
 import { setdata } from "../redux/Data/slice";
 import { setError } from "../redux/Errors/slice";
-
-
+import { Requestdata } from "../functions/Requestdata";
+import { useActivepath } from "../hooks/useUpaths";
 
 const Aside = () => {
 
     const { username } = useUsername()
     const { paths, activepathindex } = useUpaths()
     const [GetdataMutation] = useGetdataMutation()
+    const {pathname} = useActivepath()
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
     async function Datarequest(path: string, method: string, data: Object) {
@@ -130,6 +132,12 @@ const Aside = () => {
 
     }
 
+    const Refresh = () => {
+        if (pathname.toLowerCase() === "this pc") {
+            return
+        }
+        Requestdata("" , GetdataMutation , dispatch , pathname)
+    }
     return (
 
         <aside className='Scroller w-[20%] h-full bg-black p-[20px] gap-[20px] flex flex-col  overflow-y-auto'>
@@ -137,7 +145,12 @@ const Aside = () => {
 
 
                 <div className="flex w-full items-center justify-between">
+
+                    <div>
+
                     <button onClick={() => dispatch(setactivepath("this pc"))}><HomeSharp className="text-white" /></button>
+                    <button onClick={() => Refresh()}  className="text-white"> <RefreshOutlined/></button>
+                    </div>
                     {paths.length > 1 ? <div className='flex text-white items-center gap-[20px] justify-end'>
 
                         {activepathindex !== 0 && <button onClick={() => HandleBackword()} className="bg-gray-900 w-[40px] h-[40px] rounded-full flex items-center justify-center"><ArrowBackIosNewOutlinedIcon sx={{ fontSize: 13 }} /></button>}

@@ -7,7 +7,7 @@ import activepath from './upaths/activepath'
 import  SliceSelected  from './selected/slice'
 import ErrorSlice from './Errors/slice'
 import MessageSlice from './Message/slice'
-
+import DialogSlice from './Dialog/slice'
 
 
 export const store = configureStore({
@@ -21,6 +21,7 @@ export const store = configureStore({
         SliceSelected: SliceSelected,
         ErrorSlice : ErrorSlice,
         MessageSlice: MessageSlice,
+        DialogSlice: DialogSlice,
         [Basequeries.reducerPath] : Basequeries.reducer
         
     },

@@ -1,14 +1,13 @@
 import { FC, JSX , useState } from 'react'
-import { ContentCopyOutlined, DeleteOutlineOutlined, DriveFileMoveOutlined, HttpsOutlined, NoEncryptionGmailerrorredOutlined , ColorizeOutlined , CancelOutlined} from '@mui/icons-material'
-
-import { useGetdataMutation } from '../redux/apis/basequeries'
-import { setdata } from '../redux/Data/slice';
+import { ContentCopyOutlined, DeleteOutlineOutlined, DriveFileMoveOutlined, HttpsOutlined, NoEncryptionGmailerrorredOutlined , ColorizeOutlined , CancelOutlined , DriveFileRenameOutlineOutlined} from '@mui/icons-material'
+import { Requestdata } from '../functions/Requestdata';
+import { useGetdataMutation } from '../redux/apis/basequeries';
 import { useDispatch } from 'react-redux';
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import { setSelectedFiles , setType } from '../redux/selected/slice';
 import { setError } from '../redux/Errors/slice';
-import { setMessage } from '../redux/Message/slice';
 import { useSeletedFiles } from '../hooks/useSelectedFiles';
+import { setDialogType , setState } from '../redux/Dialog/slice';
 
 interface Propdata {
 
@@ -27,28 +26,7 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
 
     const [upathname, setupatname] = useState<string>("")
 
-    const Requestdata = async (message : string) => {
-
-        const response =    await Form_Mutation({ path:   `http://localhost:5000/getpath`  , method: "POST" , data: {path:  pathname}})
-
-        if (response.data.success) {
-           
-            
-            dispatch(setdata(response.data.pathdata))
-            dispatch(setMessage(message))
-          
-            setTimeout(() => {
-               dispatch(setMessage(""))
-            } , 3000)
-        }
-        else{
-            dispatch(setError("An error occured!"))
-         
-            return
-        }
-        dispatch(setSelectedFiles([]))
-        dispatch(setType(null));
-    }
+    
 
     const HandleMove = async () => {
         setupatname(pathname)
@@ -59,6 +37,11 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
     const CancleAction = () => {
         dispatch(setType(null))
         dispatch(setSelectedFiles([]))
+    }
+
+    const Renamepath = () => {
+        dispatch(setState(true))
+        dispatch(setDialogType("rename"))
     }
 
     const HandleDelete = async () => {
@@ -78,7 +61,7 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
             }
             else{
              
-                Requestdata("Files deleted successfully!")
+                Requestdata( "Files deleted successfully!" , Form_Mutation , dispatch , pathname)
 
 
             }
@@ -100,7 +83,7 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
             return
         }
         else{
-            Requestdata("Files moved to destination!")
+            Requestdata("Files moved to destination!" , Form_Mutation , dispatch , pathname)
 
 
         }
@@ -111,20 +94,25 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
     return (
         selectedfiles.length > 0 ? <div className='flex items-center gap-[20px] w-full text-white w-max px-[20px]'>
            {type === "move"  ? <div className='w-full flex items-center gap-[20px]'>
-            <>
+        
             
-            <button onClick={() => MoveFiles()} disabled={(upathname === "this pc" ||  upathname === pathname) ? true : false} className={(upathname === "this pc" ||  upathname === pathname)  ?  "text-gray-500" : "text-white"} ><ColorizeOutlined sx={{ fontSize: 16 }}/></button>
+            <button onClick={() => MoveFiles()} disabled={(upathname === "this pc" ||  upathname === pathname) ? true : false} className={(pathname === "this pc" ||  upathname === pathname)  ?  "text-gray-500" : "text-white"} ><ColorizeOutlined sx={{ fontSize: 16 }}/></button>
             <button title='cancel' onClick={() => CancleAction()} className='hover:bg-red-500 opbtns'><CancelOutlined /></button>
 
-            </>
+            
 
            </div>
 
            
            :  <>
             <button onClick={() => HandleDelete()} title='delete' className='hover:bg-red-500 opbtns'><DeleteOutlineOutlined sx={{ fontSize: 16 }} /></button>
-            <button title='copy' className='hover:bg-gray-500 opbtns'><ContentCopyOutlined sx={{ fontSize: 16 }} /></button>
+            
+            {selectedfiles.length === 1 ? <button onClick={() => Renamepath()} title='Rename' className='hover:bg-gray-500 opbtns'><DriveFileRenameOutlineOutlined sx={{ fontSize: 16 }}/></button>  : <></> }
+            
+            <button title='copy' className='hover:bg-gray-500 opbtns'><ContentCopyOutlined  sx={{ fontSize: 16 }} /></button>
+            
             <button title='move' onClick={() => HandleMove()}  className='hover:bg-gray-500 opbtns'><DriveFileMoveOutlined sx={{ fontSize: 16 }} /></button>
+            
             <button title='encrypt' className='hover:bg-gray-500 opbtns'><HttpsOutlined sx={{ fontSize: 16 }} /></button>
             <button title='decrypt' className='hover:bg-gray-500 opbtns'><NoEncryptionGmailerrorredOutlined sx={{ fontSize: 16 }} /></button>
             </>}

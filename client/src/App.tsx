@@ -21,9 +21,9 @@ import { setpaths } from './redux/upaths/slice'
 import { setSelectedFiles } from './redux/selected/slice'
 import { useSeletedFiles } from './hooks/useSelectedFiles'
 import { Operations } from './components/Operations'
-
+import { RenameDialog } from './components/RenameDialog'
 import { setError } from './redux/Errors/slice'
-
+import { useDialogState } from './hooks/useDialogData'
 import { useError } from './hooks/useError'
 import { useMessage } from './hooks/useMessage'
 
@@ -34,11 +34,11 @@ export default function App() {
   const [Data, setData] = useState([])
   const { paths, activepathindex } = useUpaths()
 
-  const {error: Error} = useError();
-  const {message: Message} = useMessage();
-  
+  const { error: Error } = useError();
+  const { message: Message } = useMessage();
+  const {dialogType , state} = useDialogState()
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
-  const { selectedfiles , type} = useSeletedFiles()
+  const { selectedfiles, type } = useSeletedFiles()
 
   const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
@@ -100,18 +100,16 @@ export default function App() {
 
   }
 
-
-
   useEffect(() => {
-  
+
     if (pathname && type !== "move" && type !== "copy") {
-      
+
       dispatch(setSelectedFiles([]))
 
     }
 
 
-  }, [pathname, dispatch , type])
+  }, [pathname, dispatch, type])
 
   useEffect(() => {
 
@@ -149,7 +147,7 @@ export default function App() {
 
       if (Maindata.error) {
         dispatch(setError("An error occured!"))
-        
+
       }
 
 
@@ -157,9 +155,9 @@ export default function App() {
 
 
 
-  }, [Maindata, pathname , dispatch])
+  }, [Maindata, pathname, dispatch])
 
-  
+
   async function Datarequest(path: string, method: string, data: Object) {
 
 
@@ -192,10 +190,10 @@ export default function App() {
     }
   }
 
-  const HandleSelectedFiles = (e : any , value: { path: string }) => {
+  const HandleSelectedFiles = (e: any, value: { path: string }) => {
     e.preventDefault()
     if (e.key !== "s") {
-        return
+      return
     }
     let files: string[] = [...selectedfiles];
 
@@ -206,7 +204,7 @@ export default function App() {
 
 
     }
-  }
+  } 
 
   const HandleIsChecked = (value: string) => {
     let files: string[] = [...selectedfiles];
@@ -225,8 +223,8 @@ export default function App() {
 
     <Layout>
 
-      <div className='flex flex-col gap-[10px] w-full'>
-
+      <div className='flex flex-col gap-[10px] w-full h-full relative'>
+        {state && dialogType === "rename" &&   <RenameDialog />}
 
         <div className=' w-full flex items-center justify-between'>
 
@@ -240,7 +238,7 @@ export default function App() {
         {Error?.trim() !== "" && <div className='flex items-center justify-center   text-white w-full'>
           <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-red-500'>{Error}</p>
         </div>}
-        
+
         {Message?.trim() !== "" && <div className='flex items-center justify-center  text-white w-full'>
           <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-green-500'>{Message}</p>
         </div>}
@@ -293,7 +291,7 @@ export default function App() {
             <div key={index} className='flex items-center '>
               {selectedfiles.includes(value["path"]) && <input type="checkbox" onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' />}
 
-              <button onKeyDown={(e) => HandleSelectedFiles(e , value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
+              <button onKeyDown={(e) => HandleSelectedFiles(e, value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
 
                 {GiveFileIcon(value["ext"], value["isdir"])}
 
@@ -306,6 +304,8 @@ export default function App() {
           ))}
 
         </div>}
+
+
       </div>
 
 

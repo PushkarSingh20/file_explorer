@@ -96,20 +96,20 @@ class FIleExplorer:
                        datatosend.append({ "isdir": False  , "size":  os.path.getsize(f"{pathname["path"]}/{i}") , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
             
             return jsonify(pathdata = datatosend , success= True)
-        except :
+        except:
             return jsonify(error="An error occured!" ,  success= False)
         
     def renamepath(self, request):
         try: 
             data = request.get_json() 
         
-            full_existing = data["fullpath"] + data["name"] 
-            full_new = data["fullpath"] + data["new"]
+            full_existing =  data["name"] 
+            full_new =  data["new"]
             os.rename(full_existing , full_new)
 
-            return jsonify(message=f"Renamed {full_existing} to {full_new}")
+            return jsonify(message=f"Renamed {full_existing} to {full_new}" , success=True)
         except:
-            return jsonify(error="An error occured!")
+            return jsonify(error="An error occured!" , success=False)
            
     def copyFile(self, request):
             try:
