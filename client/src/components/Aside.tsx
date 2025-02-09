@@ -76,7 +76,6 @@ const Aside = () => {
 
         if (paths[path_index]) {
 
-
             if (paths[path_index] !== "this pc") {
                 let response = await Datarequest("/getpath", "POST", { "path": paths[path_index] })
                 if (response.data.success) {
@@ -162,7 +161,7 @@ const Aside = () => {
                 </div>
 
                 {BasicFiles.map((value, index) => {
-                    return <motion.button onClick={() => HandlePath(value.path, dispatch, paths, activepathindex + 1)} whileHover={{
+                    return <motion.button onClick={() => HandlePath(value.path, dispatch, paths)} whileHover={{
                         scale: 1.1,
                         transition: { duration: 0.2, ease: 'easeInOut' }
                     }} key={index} className=" text-white text-[12px] flex items-center w-full w-full gap-[20px]">

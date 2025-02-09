@@ -110,7 +110,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
         }
         else {
 
-            dispatch(setError("Failed to encrypt!"))
+            dispatch(setError(response.data.message))
             setTimeout(() => {
                 dispatch(setError(""))
             }, 3000)
@@ -137,7 +137,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
         }
         else {
 
-            dispatch(setError("Failed to decrypt!"))
+            dispatch(setError(response.data.message))
             setTimeout(() => {
                 dispatch(setError(""))
             }, 3000)

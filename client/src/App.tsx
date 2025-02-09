@@ -36,8 +36,10 @@ export default function App() {
 
   const { error: Error } = useError();
   const { message: Message } = useMessage();
+
   const { dialogType, state } = useDialogState()
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
+
   const { selectedfiles, type } = useSeletedFiles()
   const [LoadingElem, setLoadingElem] = useState<Boolean>(false)
 
@@ -238,7 +240,7 @@ export default function App() {
 
           <p className='p-[20px] text-white'>{pathname}</p>
           {LoadingElem ?   <></> : <Operations pathname={pathname} setLoadingElem={setLoadingElem} selectedfiles={selectedfiles} />}
-
+          
         </div>
 
         {Error?.trim() !== "" && <div className='flex items-center justify-center   text-white w-full'>
@@ -301,13 +303,13 @@ export default function App() {
             <div key={index} className='flex items-center '>
               {selectedfiles.includes(value["path"]) && <input type="checkbox" onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' />}
 
-              <button onKeyDown={(e) => HandleSelectedFiles(e, value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
+              <button onKeyDown={(e) => HandleSelectedFiles(e, value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
 
                 {GiveFileIcon(value["ext"], value["isdir"])}
 
                 <p className='text-slate-200'>{value["name"]} </p>
-                <p className='text-slate-500'>{value["size"]} bytes</p>
-
+                
+            
               </button>
 
             </div>

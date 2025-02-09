@@ -28,9 +28,6 @@ def Renamepath():
 
 
 
-
-    
-
  
 @app.route('/delete' , methods=["DELETE"])
 def delete():

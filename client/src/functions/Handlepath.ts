@@ -9,8 +9,7 @@ import { setpaths , setactiveindex } from "../redux/upaths/slice";
 export const HandlePath = async (
   path: string,
   dispatch: Dispatch,
-  paths: string[],
-  activepathindex: Number
+  paths: string[]
 ) => {
 
   if (path.toLowerCase() === "this pc") {
@@ -38,8 +37,13 @@ export const HandlePath = async (
       
       dispatch(setdata(data.pathdata));
       dispatch(setactivepath(!path.endsWith("/") ? path + "/" : path));
-      dispatch(setpaths([...paths, path]));
-      dispatch(setactiveindex(Number(activepathindex) ))
+      
+      if (path !== paths[paths.length - 1]) {
+        let pathdata = [...paths, path]
+        dispatch(setpaths(pathdata));
+        dispatch(setactiveindex(Number(pathdata.length) -1 ))
+
+      }
       
     } else {
       console.warn("No path data received from the server.");
