@@ -36,9 +36,9 @@ export default function App() {
 
   const {error: Error} = useError();
   const {message: Message} = useMessage();
-
+  
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
-  const { selectedfiles } = useSeletedFiles()
+  const { selectedfiles , type} = useSeletedFiles()
 
   const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
@@ -101,15 +101,17 @@ export default function App() {
   }
 
 
-  useEffect(() => {
 
-    if (pathname) {
+  useEffect(() => {
+  
+    if (pathname && type !== "move" && type !== "copy") {
+      
       dispatch(setSelectedFiles([]))
 
     }
 
 
-  }, [pathname, dispatch])
+  }, [pathname, dispatch , type])
 
   useEffect(() => {
 
@@ -190,8 +192,11 @@ export default function App() {
     }
   }
 
-  const HandleSelectedFiles = (value: { path: string }) => {
-
+  const HandleSelectedFiles = (e : any , value: { path: string }) => {
+    e.preventDefault()
+    if (e.key !== "s") {
+        return
+    }
     let files: string[] = [...selectedfiles];
 
 
@@ -232,10 +237,11 @@ export default function App() {
 
         </div>
 
-        {Error.trim() !== "" && <div className='flex items-center justify-center   text-white w-full'>
+        {Error?.trim() !== "" && <div className='flex items-center justify-center   text-white w-full'>
           <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-red-500'>{Error}</p>
         </div>}
-        {Message.trim() !== "" && <div className='flex items-center justify-center  text-white w-full'>
+        
+        {Message?.trim() !== "" && <div className='flex items-center justify-center  text-white w-full'>
           <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-green-500'>{Message}</p>
         </div>}
 
@@ -287,7 +293,7 @@ export default function App() {
             <div key={index} className='flex items-center '>
               {selectedfiles.includes(value["path"]) && <input type="checkbox" onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' />}
 
-              <button onClick={() => HandleSelectedFiles(value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
+              <button onKeyDown={(e) => HandleSelectedFiles(e , value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths, paths.length)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
 
                 {GiveFileIcon(value["ext"], value["isdir"])}
 

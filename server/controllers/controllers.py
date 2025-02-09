@@ -124,17 +124,6 @@ class FIleExplorer:
             except :
                 return jsonify(error="An error occured!")
             
-    def moveFile(self, request):
-            try:
-                data = request.get_json()
-                full_existing = data["fullpath"] + data["file"] 
-                destination_path = data["endpath"]
-                shutil.move(full_existing, destination_path)
-                return jsonify(message=f" {full_existing} moved to {destination_path} ")
-            except Exception as e:
-                print(e)
-                return jsonify(error="An error occured!")
-    
     def Del(self, request):
             try:
                 data = request.get_json()
@@ -148,16 +137,16 @@ class FIleExplorer:
             except :
                 return jsonify(error= "An error occured" , success=False)
             
-    def multiMove(self, request):
+    def move(self, request):
             try:
                 data = request.get_json()
                 for i in data["files"]:
-                    pathname = data["fullpath"] +  i
-                    os.chmod(pathname, 0o666)
-                    shutil.move(pathname, data["destination"])
-                return jsonify(message="moved successfully!")
-            except: 
-                return jsonify(error="An error occured!")
+                 
+                   
+                    shutil.move(i, data["destination"])
+                return jsonify(message="moved successfully!" , success = True)
+            except : 
+                return jsonify(error="An error occured!" , success = False)
 
     def multiCopy(self, request):
             try:
@@ -174,8 +163,7 @@ class FIleExplorer:
                          
                         shutil.copy(pathname, data["destination"])
                 return jsonify(message="copyed successfully!")
-            except Exception as e:
-                print(e)
+            except:
                 return jsonify(error="An error occured!")
  
     def searchFiles(self , request):
@@ -245,11 +233,9 @@ class FIleExplorer:
 
                   
                           
-        except Exception as e:
-             print(e) 
+        except :
              return jsonify(error= "An error occured!")
              
-
     def decryptFiles(self, request):
         try: 
             reqdata = request.get_json()
