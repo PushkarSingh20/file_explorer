@@ -22,7 +22,7 @@ const Aside = () => {
     const { username } = useUsername()
     const { paths, activepathindex } = useUpaths()
     const [GetdataMutation] = useGetdataMutation()
-    const {pathname} = useActivepath()
+    const { pathname } = useActivepath()
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
     async function Datarequest(path: string, method: string, data: Object) {
@@ -136,7 +136,7 @@ const Aside = () => {
         if (pathname.toLowerCase() === "this pc") {
             return
         }
-        Requestdata("" , GetdataMutation , dispatch , pathname)
+        Requestdata("", GetdataMutation, dispatch, pathname)
     }
     return (
 
@@ -148,8 +148,8 @@ const Aside = () => {
 
                     <div>
 
-                    <button onClick={() => dispatch(setactivepath("this pc"))}><HomeSharp className="text-white" /></button>
-                    <button onClick={() => Refresh()}  className="text-white"> <RefreshOutlined/></button>
+                        <button onClick={() => dispatch(setactivepath("this pc"))}><HomeSharp className="text-white" /></button>
+                        <button onClick={() => Refresh()} className="text-white"> <RefreshOutlined /></button>
                     </div>
                     {paths.length > 1 ? <div className='flex text-white items-center gap-[20px] justify-end'>
 

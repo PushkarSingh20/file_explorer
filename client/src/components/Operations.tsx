@@ -13,12 +13,13 @@ interface Propdata {
 
     selectedfiles: string[],
     pathname: string,
+    setLoadingElem: any
 
 
 }
 
 
-export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Element => {
+export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingElem }): JSX.Element => {
 
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
     const [Form_Mutation] = useGetdataMutation();
@@ -31,7 +32,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
             return
         }
         const response = await Form_Mutation({ path: `http://localhost:5000/copy`, method: "PUT", data: { files: selectedfiles, destination: pathname } })
-
+        setLoadingElem(true)
         if (!response.data.success) {
 
             dispatch(setError("Failed to copy!"))
@@ -43,6 +44,8 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
         else {
             Requestdata(`Files copied to ${pathname}!`, Form_Mutation, dispatch, pathname)
         }
+
+        setLoadingElem(false)
     }
 
     const HandleMoveCopy = async (type: string) => {
@@ -50,7 +53,6 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
         dispatch(setType(type))
         dispatch(setSelectedFiles(selectedfiles))
     }
-  
 
     const CancleAction = () => {
         dispatch(setType(null))
@@ -72,6 +74,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
         if (selectedfiles.length === 0) {
             return
         }
+        setLoadingElem(true)
         const response = await Form_Mutation({ path: `http://localhost:5000/move`, method: "PUT", data: { files: selectedfiles, destination: pathname } })
 
         if (!response.data.success) {
@@ -87,21 +90,63 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
 
 
         }
-
+        setLoadingElem(false)
 
     }
 
-    const HandleEncrypt = async () => {
+    const HandleEncrypt = async () => { 
 
-            if (selectedfiles.length === 0) {
-                    return
-            }
+        if (selectedfiles.length === 0) {
+            return
+        }
+
+        setLoadingElem(true)
+        const response = await Form_Mutation({ path: `http://localhost:5000/encryptfiles`, method: "POST", data: { files: selectedfiles } })
+
+        if (response.data.success) {
 
 
-            const response  = await Form_Mutation({ path: `http://localhost:5000/encryptfiles`, method: "POST" , data: {files: selectedfiles}})
+            Requestdata("Files encrypted!", Form_Mutation, dispatch, pathname)
+        }
+        else {
+
+            dispatch(setError("Failed to encrypt!"))
+            setTimeout(() => {
+                dispatch(setError(""))
+            }, 3000)
+
+            dispatch(setSelectedFiles([]))
+            dispatch(setType(null))
+        }
+
+        setLoadingElem(false)
+    }
+
+    const HandleDecrypt = async () => {
+        if (selectedfiles.length === 0) {
+            return
+        }
+
+        setLoadingElem(true)
+        const response = await Form_Mutation({ path: `http://localhost:5000/decryptfiles`, method: "POST", data: { files: selectedfiles } })
+
+        if (response.data.success) {
 
 
-            console.log(response)
+            Requestdata("Files decrypted!", Form_Mutation, dispatch, pathname)
+        }
+        else {
+
+            dispatch(setError("Failed to decrypt!"))
+            setTimeout(() => {
+                dispatch(setError(""))
+            }, 3000)
+
+            dispatch(setSelectedFiles([]))
+            dispatch(setType(null))
+        }
+
+        setLoadingElem(false)    
     }
 
     return (
@@ -136,7 +181,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
                     <button title='move' onClick={() => HandleMoveCopy("move")} className='hover:bg-gray-500 opbtns'><DriveFileMoveOutlined sx={{ fontSize: 16 }} /></button>
 
                     <button title='encrypt' onClick={() => HandleEncrypt()} className='hover:bg-gray-500 opbtns'><HttpsOutlined sx={{ fontSize: 16 }} /></button>
-                    <button title='decrypt' className='hover:bg-gray-500 opbtns'><NoEncryptionGmailerrorredOutlined sx={{ fontSize: 16 }} /></button>
+                    <button title='decrypt' onClick={() => HandleDecrypt()} className='hover:bg-gray-500 opbtns'><NoEncryptionGmailerrorredOutlined sx={{ fontSize: 16 }} /></button>
                 </>)}
 
 

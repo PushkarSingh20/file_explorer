@@ -36,9 +36,10 @@ export default function App() {
 
   const { error: Error } = useError();
   const { message: Message } = useMessage();
-  const {dialogType , state} = useDialogState()
+  const { dialogType, state } = useDialogState()
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
   const { selectedfiles, type } = useSeletedFiles()
+  const [LoadingElem, setLoadingElem] = useState<Boolean>(false)
 
   const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
@@ -49,7 +50,7 @@ export default function App() {
   const { pathname } = useActivepath()
   const [GetdataMutation] = useGetdataMutation()
 
-  
+
   interface filesProps {
 
     partition_name: string,
@@ -155,7 +156,6 @@ export default function App() {
 
   }, [Maindata, pathname, dispatch])
 
-
   async function Datarequest(path: string, method: string, data: Object) {
 
 
@@ -167,6 +167,9 @@ export default function App() {
   }
 
   const Handledrive = async (path: string) => {
+    if (LoadingElem) {
+      return
+    }
     let pathname = path.replace(/\\/g, "/")
 
     let response = await Datarequest("/getpath", "POST", { "path": pathname })
@@ -189,8 +192,9 @@ export default function App() {
   }
 
   const HandleSelectedFiles = (e: any, value: { path: string }) => {
+    
     e.preventDefault()
-    if (e.key !== "s") {
+    if (e.key !== "s" || LoadingElem) {
       return
     }
     let files: string[] = [...selectedfiles];
@@ -202,9 +206,12 @@ export default function App() {
 
 
     }
-  } 
+  }
 
   const HandleIsChecked = (value: string) => {
+    if (LoadingElem) {
+        return
+    }
     let files: string[] = [...selectedfiles];
 
     if (files.includes(value)) {
@@ -223,16 +230,14 @@ export default function App() {
 
       <div className='flex flex-col gap-[10px] w-full h-full relative'>
 
-        {state && dialogType === "rename" &&   <RenameDialog />}
+        {state && dialogType === "rename" && <RenameDialog  setLoadingElem={setLoadingElem}/>}
 
-        {state && dialogType === "delete" && <DeleteDialog/>}
+        {state && dialogType === "delete" && <DeleteDialog setLoadingElem={setLoadingElem}/>}
 
         <div className=' w-full flex items-center justify-between'>
 
           <p className='p-[20px] text-white'>{pathname}</p>
-
-          <Operations pathname={pathname} selectedfiles={selectedfiles} />
-
+          {LoadingElem ?   <></> : <Operations pathname={pathname} setLoadingElem={setLoadingElem} selectedfiles={selectedfiles} />}
 
         </div>
 
@@ -243,6 +248,10 @@ export default function App() {
         {Message?.trim() !== "" && <div className='flex items-center justify-center  text-white w-full'>
           <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-green-500'>{Message}</p>
         </div>}
+        
+        {LoadingElem ?  <div className='flex items-center justify-center  text-white w-full'>
+          <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-yellow-500'>Performing action!</p>
+        </div> :<></> }
 
         {pathname.toLowerCase() === "this pc" ? <>
           {Data.length > 0 ? <div className='flex  gap-[20px] p-[20px]'>
@@ -300,6 +309,7 @@ export default function App() {
                 <p className='text-slate-500'>{value["size"]} bytes</p>
 
               </button>
+
             </div>
 
           ))}

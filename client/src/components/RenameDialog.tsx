@@ -1,4 +1,4 @@
-
+import { FC , JSX } from "react"
 import { useSeletedFiles } from "../hooks/useSelectedFiles"
 import { useState } from "react"
 import { CheckCircleOutline , CancelOutlined } from "@mui/icons-material"
@@ -9,7 +9,11 @@ import { useDispatch } from "react-redux"
 import { ThunkDispatch } from "@reduxjs/toolkit"
 import { setDialogType , setState } from "../redux/Dialog/slice"
 
-export const RenameDialog =  () => {
+interface Props {
+    setLoadingElem : any
+}
+
+export const RenameDialog : FC<Props> =  ({ setLoadingElem }) : JSX.Element => {
     
     const [Error, setError] = useState<string>("")
     const {selectedfiles} :  { selectedfiles: string[] } = useSeletedFiles()
@@ -23,7 +27,7 @@ export const RenameDialog =  () => {
     const UpdateData = async () => {
         
         const response  = await FormMutation({ path: "/rename" , method: "PATCH" , data: {name: selectedfiles[0] , new: pathname + NewName}   })
-        
+        setLoadingElem(true)
         if (response.data.success) {
 
             Requestdata(`Renamed ${selectedfiles[0]} to ${pathname + NewName}` ,  FormMutation , dispatch , pathname )
@@ -36,6 +40,7 @@ export const RenameDialog =  () => {
                 setError("")
             } , 3000)
         }
+        setLoadingElem(false)
 
     }
 

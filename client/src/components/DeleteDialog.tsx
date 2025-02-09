@@ -1,3 +1,4 @@
+import { FC , JSX } from "react"
 import { useSeletedFiles } from "../hooks/useSelectedFiles"
 import { CheckCircleOutline, CancelOutlined } from '@mui/icons-material'
 import { useGetdataMutation } from "../redux/apis/basequeries"
@@ -8,7 +9,12 @@ import { Requestdata } from "../functions/Requestdata"
 import { useActivepath } from "../hooks/useUpaths"
 import { setDialogType, setState } from "../redux/Dialog/slice"
 
-export default function DeleteDialog() {
+
+interface Props {
+  setLoadingElem : any
+}
+
+ const DeleteDialog: FC<Props> = ({ setLoadingElem }) : JSX.Element =>  {
 
 
   const { selectedfiles } = useSeletedFiles()
@@ -22,6 +28,7 @@ export default function DeleteDialog() {
     if (!selectedfiles.length) {
       return
     }
+    setLoadingElem(true)
     const response = await Form_Mutation({ path: `http://localhost:5000/delete`, method: "DELETE", data: { files: selectedfiles } })
 
     if (!response.data.success) {
@@ -39,6 +46,7 @@ export default function DeleteDialog() {
       
 
     }
+    setLoadingElem(false)
 
   }
 
@@ -69,3 +77,6 @@ export default function DeleteDialog() {
     </div>
   )
 }
+
+
+export default DeleteDialog

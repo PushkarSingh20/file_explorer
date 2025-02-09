@@ -241,6 +241,24 @@ class FIleExplorer:
              
     def decryptFiles(self, request):
         try: 
+
+            def Decrypt(file):
+                try: 
+                    with open(file , "rb") as File:
+                        fdata = File.read()
+                            
+                    f = Fernet(key)
+                    decrypteddata = f.decrypt(fdata)
+                                
+                    with open(file, "wb") as wFile:
+                                
+                        wFile.write(decrypteddata)
+
+                except PermissionError:
+                    return jsonify(error="Permission error!", success=False)
+                except Exception as e:
+                     return jsonify(error="Error while decrypting!", success=False)
+                
             reqdata = request.get_json()
 
             files = reqdata["files"]
@@ -249,25 +267,23 @@ class FIleExplorer:
             
             if key:
                 for file in files:
-                   
-                    if os.path.exists(file):
-                        with open(file , "rb") as File:
-                            fdata = File.read()
-                           
-                            f = Fernet(key)
-                            decrypteddata = f.decrypt(fdata)
-                            
-                        with open(file, "wb") as wFile:
-                            
-                            wFile.write(decrypteddata)
+                    absfillname = os.path.abspath(file)
+                    if os.path.isdir(absfillname):
+                        for root , _ , filenames in os.walk(absfillname):
+                            for filename in filenames:
+                                Decrypt(os.path.join(root,  filename))
+                    if os.path.exists(absfillname):
+                       Decrypt(absfillname)
+                    else:
+                         return jsonify(error="No such file or directory!" , success=False)
 
-
-                return jsonify(data="Provided files decrypted!")
+                return jsonify(data="Provided files decrypted!" , success=True)
             else:
-                return jsonify(error="Key not found!")
+                return jsonify(error="Key not found!" , success=False)
             
-        except:
-             return jsonify(error= "An error occured!")
+        except Exception as e:
+             print(e)
+             return jsonify(error= "An error occured!" , success=False)
 
 FileExp = FIleExplorer()
 
