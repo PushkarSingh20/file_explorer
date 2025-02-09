@@ -112,17 +112,7 @@ class FIleExplorer:
             return jsonify(error="An error occured!" , success=False)
            
  
-            try:
-                data = request.get_json()
-                full_existing = data["fullpath"] + data["file"] 
-                destination_path = data["endpath"]
-               
-                shutil.copy(full_existing, destination_path)
-                
-                return jsonify(message=f"{full_existing} copied to {destination_path}")
-            
-            except :
-                return jsonify(error="An error occured!")
+
             
     def Del(self, request):
             try:
@@ -162,7 +152,7 @@ class FIleExplorer:
                     if os.path.isdir(pathname):
                          
                          shutil.copytree(pathname,  os.path.join( data["destination"] , os.path.basename(pathname)))
-
+                         
                     else:
 
                         shutil.copy(pathname,  os.path.join( data["destination"] , os.path.basename(pathname)))

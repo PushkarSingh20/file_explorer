@@ -26,7 +26,7 @@ import { setError } from './redux/Errors/slice'
 import { useDialogState } from './hooks/useDialogData'
 import { useError } from './hooks/useError'
 import { useMessage } from './hooks/useMessage'
-
+import DeleteDialog from './components/DeleteDialog'
 
 export default function App() {
 
@@ -224,7 +224,10 @@ export default function App() {
     <Layout>
 
       <div className='flex flex-col gap-[10px] w-full h-full relative'>
+
         {state && dialogType === "rename" &&   <RenameDialog />}
+        
+        {state && dialogType === "delete" && <DeleteDialog/>}
 
         <div className=' w-full flex items-center justify-between'>
 

@@ -41,7 +41,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
             return
         }
         else {
-            Requestdata("Files copied to copy!", Form_Mutation, dispatch, pathname)
+            Requestdata(`Files copied to ${pathname}!`, Form_Mutation, dispatch, pathname)
         }
     }
 
@@ -63,26 +63,8 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
     }
 
     const HandleDelete = async () => {
-
-        if (!selectedfiles.length) {
-            return
-        }
-        const response = await Form_Mutation({ path: `http://localhost:5000/delete`, method: "DELETE", data: { files: selectedfiles } })
-
-        if (!response.data.success) {
-
-            dispatch(setError("Failed to delete!"))
-            setTimeout(() => {
-                dispatch(setError(""))
-            }, 3000)
-            return
-        }
-        else {
-
-            Requestdata("Files deleted successfully!", Form_Mutation, dispatch, pathname)
-
-
-        }
+        dispatch(setState(true))
+        dispatch(setDialogType("delete"))
 
     }
 
