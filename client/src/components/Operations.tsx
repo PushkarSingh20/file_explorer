@@ -1,13 +1,13 @@
-import { FC, JSX , useState } from 'react'
-import { ContentCopyOutlined, DeleteOutlineOutlined, DriveFileMoveOutlined, HttpsOutlined, NoEncryptionGmailerrorredOutlined , ColorizeOutlined , CancelOutlined , DriveFileRenameOutlineOutlined} from '@mui/icons-material'
+import { FC, JSX, useState } from 'react'
+import { ContentCopyOutlined, DeleteOutlineOutlined, DriveFileMoveOutlined, HttpsOutlined, NoEncryptionGmailerrorredOutlined, ColorizeOutlined, CancelOutlined, DriveFileRenameOutlineOutlined } from '@mui/icons-material'
 import { Requestdata } from '../functions/Requestdata';
 import { useGetdataMutation } from '../redux/apis/basequeries';
 import { useDispatch } from 'react-redux';
 import { ThunkDispatch } from '@reduxjs/toolkit';
-import { setSelectedFiles , setType } from '../redux/selected/slice';
+import { setSelectedFiles, setType } from '../redux/selected/slice';
 import { setError } from '../redux/Errors/slice';
 import { useSeletedFiles } from '../hooks/useSelectedFiles';
-import { setDialogType , setState } from '../redux/Dialog/slice';
+import { setDialogType, setState } from '../redux/Dialog/slice';
 
 interface Propdata {
 
@@ -18,21 +18,39 @@ interface Propdata {
 }
 
 
-export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Element => {
+export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Element => {
 
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
     const [Form_Mutation] = useGetdataMutation();
-    const {type } = useSeletedFiles();
+    const { type } = useSeletedFiles();
 
     const [upathname, setupatname] = useState<string>("")
 
-    
+    const CopyFiles = async () => {
+        if (selectedfiles.length === 0) {
+            return
+        }
+        const response = await Form_Mutation({ path: `http://localhost:5000/copy`, method: "PUT", data: { files: selectedfiles, destination: pathname } })
 
-    const HandleMove = async () => {
+        if (!response.data.success) {
+
+            dispatch(setError("Failed to copy!"))
+            setTimeout(() => {
+                dispatch(setError(""))
+            }, 3000)
+            return
+        }
+        else {
+            Requestdata("Files copied to copy!", Form_Mutation, dispatch, pathname)
+        }
+    }
+
+    const HandleMoveCopy = async (type: string) => {
         setupatname(pathname)
-        dispatch(setType("move"))
+        dispatch(setType(type))
         dispatch(setSelectedFiles(selectedfiles))
     }
+  
 
     const CancleAction = () => {
         dispatch(setType(null))
@@ -45,45 +63,45 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
     }
 
     const HandleDelete = async () => {
-         
-            if (!selectedfiles.length) {
-                return
-            }
-            const response  = await Form_Mutation({ path:   `http://localhost:5000/delete`  , method: "DELETE" , data: {files: selectedfiles} })
 
-            if (!response.data.success) {
+        if (!selectedfiles.length) {
+            return
+        }
+        const response = await Form_Mutation({ path: `http://localhost:5000/delete`, method: "DELETE", data: { files: selectedfiles } })
 
-                dispatch(setError("Failed to delete!"))
-                setTimeout(() => {
-                    dispatch(setError(""))
-                } , 3000)
-                return
-            }
-            else{
-             
-                Requestdata( "Files deleted successfully!" , Form_Mutation , dispatch , pathname)
+        if (!response.data.success) {
+
+            dispatch(setError("Failed to delete!"))
+            setTimeout(() => {
+                dispatch(setError(""))
+            }, 3000)
+            return
+        }
+        else {
+
+            Requestdata("Files deleted successfully!", Form_Mutation, dispatch, pathname)
 
 
-            }
+        }
 
     }
 
     const MoveFiles = async () => {
-        if (!selectedfiles.length) {
+        if (selectedfiles.length === 0) {
             return
         }
-        const response  = await Form_Mutation({ path:   `http://localhost:5000/move`  , method: "PUT" , data: {files: selectedfiles , destination: pathname} })
+        const response = await Form_Mutation({ path: `http://localhost:5000/move`, method: "PUT", data: { files: selectedfiles, destination: pathname } })
 
         if (!response.data.success) {
 
             dispatch(setError("Failed to move!"))
             setTimeout(() => {
                 dispatch(setError(""))
-            } , 3000)
+            }, 3000)
             return
         }
-        else{
-            Requestdata("Files moved to destination!" , Form_Mutation , dispatch , pathname)
+        else {
+            Requestdata("Files moved to destination!", Form_Mutation, dispatch, pathname)
 
 
         }
@@ -93,29 +111,38 @@ export const Operations: FC<Propdata> = ({selectedfiles , pathname }): JSX.Eleme
 
     return (
         selectedfiles.length > 0 ? <div className='flex items-center gap-[20px] w-full text-white w-max px-[20px]'>
-           {type === "move"  ? <div className='w-full flex items-center gap-[20px]'>
-        
-            
-            <button onClick={() => MoveFiles()} disabled={(upathname === "this pc" ||  upathname === pathname) ? true : false} className={(pathname === "this pc" ||  upathname === pathname)  ?  "text-gray-500" : "text-white"} ><ColorizeOutlined sx={{ fontSize: 16 }}/></button>
-            <button title='cancel' onClick={() => CancleAction()} className='hover:bg-red-500 opbtns'><CancelOutlined /></button>
+            {type === "copy" ? (<div className='w-full flex items-center gap-[20px]'>
 
-            
 
-           </div>
+                <button onClick={() => CopyFiles()} disabled={(upathname === "this pc" || upathname === pathname) ? true : false} className={(pathname === "this pc" || upathname === pathname) ? "text-gray-500" : "text-white"} ><ColorizeOutlined sx={{ fontSize: 16 }} /></button>
+                <button title='cancel' onClick={() => CancleAction()} className='hover:bg-red-500 opbtns'><CancelOutlined /></button>
 
-           
-           :  <>
-            <button onClick={() => HandleDelete()} title='delete' className='hover:bg-red-500 opbtns'><DeleteOutlineOutlined sx={{ fontSize: 16 }} /></button>
-            
-            {selectedfiles.length === 1 ? <button onClick={() => Renamepath()} title='Rename' className='hover:bg-gray-500 opbtns'><DriveFileRenameOutlineOutlined sx={{ fontSize: 16 }}/></button>  : <></> }
-            
-            <button title='copy' className='hover:bg-gray-500 opbtns'><ContentCopyOutlined  sx={{ fontSize: 16 }} /></button>
-            
-            <button title='move' onClick={() => HandleMove()}  className='hover:bg-gray-500 opbtns'><DriveFileMoveOutlined sx={{ fontSize: 16 }} /></button>
-            
-            <button title='encrypt' className='hover:bg-gray-500 opbtns'><HttpsOutlined sx={{ fontSize: 16 }} /></button>
-            <button title='decrypt' className='hover:bg-gray-500 opbtns'><NoEncryptionGmailerrorredOutlined sx={{ fontSize: 16 }} /></button>
-            </>}
+
+
+            </div>
+            ) : (type === "move" ? <div className='w-full flex items-center gap-[20px]'>
+
+
+                <button onClick={() => MoveFiles()} disabled={(upathname === "this pc" || upathname === pathname) ? true : false} className={(pathname === "this pc" || upathname === pathname) ? "text-gray-500" : "text-white"} ><ColorizeOutlined sx={{ fontSize: 16 }} /></button>
+                <button title='cancel' onClick={() => CancleAction()} className='hover:bg-red-500 opbtns'><CancelOutlined /></button>
+
+
+
+            </div>
+
+
+                : <>
+                    <button onClick={() => HandleDelete()} title='delete' className='hover:bg-red-500 opbtns'><DeleteOutlineOutlined sx={{ fontSize: 16 }} /></button>
+
+                    {selectedfiles.length === 1 ? <button onClick={() => Renamepath()} title='Rename' className='hover:bg-gray-500 opbtns'><DriveFileRenameOutlineOutlined sx={{ fontSize: 16 }} /></button> : <></>}
+
+                    <button title='copy' onClick={() => HandleMoveCopy("copy")} className='hover:bg-gray-500 opbtns'><ContentCopyOutlined sx={{ fontSize: 16 }} /></button>
+
+                    <button title='move' onClick={() => HandleMoveCopy("move")} className='hover:bg-gray-500 opbtns'><DriveFileMoveOutlined sx={{ fontSize: 16 }} /></button>
+
+                    <button title='encrypt' className='hover:bg-gray-500 opbtns'><HttpsOutlined sx={{ fontSize: 16 }} /></button>
+                    <button title='decrypt' className='hover:bg-gray-500 opbtns'><NoEncryptionGmailerrorredOutlined sx={{ fontSize: 16 }} /></button>
+                </>)}
 
 
         </div> : <></>

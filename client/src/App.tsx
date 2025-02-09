@@ -49,7 +49,7 @@ export default function App() {
   const { pathname } = useActivepath()
   const [GetdataMutation] = useGetdataMutation()
 
-
+  
 
 
   interface filesProps {

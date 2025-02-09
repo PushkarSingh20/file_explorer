@@ -111,7 +111,7 @@ class FIleExplorer:
         except:
             return jsonify(error="An error occured!" , success=False)
            
-    def copyFile(self, request):
+ 
             try:
                 data = request.get_json()
                 full_existing = data["fullpath"] + data["file"] 
@@ -148,23 +148,29 @@ class FIleExplorer:
             except : 
                 return jsonify(error="An error occured!" , success = False)
 
-    def multiCopy(self, request):
+    def Copyfile(self, request):
+        
             try:
 
                 data = request.get_json()
              
                 for i in data["files"]:
-                    pathname = data["fullpath"] +  i
-                    os.chmod(pathname, 0o666)
 
+                    pathname =   i
+                    
+                
                     if os.path.isdir(pathname):
-                         shutil.copytree(pathname,  data["destination"])
-                    else:
                          
-                        shutil.copy(pathname, data["destination"])
-                return jsonify(message="copyed successfully!")
+                         shutil.copytree(pathname,  os.path.join( data["destination"] , os.path.basename(pathname)))
+
+                    else:
+
+                        shutil.copy(pathname,  os.path.join( data["destination"] , os.path.basename(pathname)))
+
+                return jsonify(message="copied successfully!" , success=True)
+
             except:
-                return jsonify(error="An error occured!")
+                return jsonify(error="An error occured!" , success=False)
  
     def searchFiles(self , request):
         try: 

@@ -10,17 +10,20 @@ import { ThunkDispatch } from "@reduxjs/toolkit"
 import { setDialogType , setState } from "../redux/Dialog/slice"
 
 export const RenameDialog =  () => {
+    
     const [Error, setError] = useState<string>("")
     const {selectedfiles} :  { selectedfiles: string[] } = useSeletedFiles()
+
     const [NewName, setNewName] = useState<string>("")
     const [FormMutation] = useGetdataMutation()
+
     const {pathname} = useActivepath()
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
     const UpdateData = async () => {
         
         const response  = await FormMutation({ path: "/rename" , method: "PATCH" , data: {name: selectedfiles[0] , new: pathname + NewName}   })
-
+        
         if (response.data.success) {
 
             Requestdata(`Renamed ${selectedfiles[0]} to ${pathname + NewName}` ,  FormMutation , dispatch , pathname )
