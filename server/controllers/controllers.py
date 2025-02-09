@@ -111,8 +111,6 @@ class FIleExplorer:
         except:
             return jsonify(error="An error occured!" , success=False)
            
- 
-
             
     def Del(self, request):
             try:
@@ -197,40 +195,49 @@ class FIleExplorer:
         except:
             return jsonify(error="An error occured")
 
-    def encryptFiles(self, request):
 
+
+    def encryptFiles(self, request):
         try: 
             reqdata = request.get_json()
-
             files = reqdata["files"]
 
             key = self.GenerateFilekey()
             
+            def file_encrypt(filepath):
+                try:
+                    with open(filepath, "rb") as File:
+                        fdata = File.read()
+                    
+                    f = Fernet(key)
+                    encryptdata = f.encrypt(fdata)
+
+                    with open(filepath, "wb") as wFile:
+                        wFile.write(encryptdata)
+
+                except PermissionError:
+                    return jsonify(error="Permission error!", success=False)
+                except Exception as e:
+                     return jsonify(error="Error while encrypting!", success=False)
+
             if key:
                 for file in files:
-                  
+                    full_path = os.path.abspath(file)
 
-                    if os.path.exists(file):
-                        with open(file , "rb") as File:
-                            fdata = File.read()
-                          
-                            f = Fernet(key)
-                            encryptdata = f.encrypt(fdata)
-                            
-                        with open(file, "wb") as wFile:
-                            
-                            wFile.write(encryptdata)
+                    if os.path.isdir(full_path):  
+                        for root, _, filenames in os.walk(full_path):
+                            for filename in filenames:
+                                file_encrypt(os.path.join(root, filename))  
+                    else:
+                        file_encrypt(full_path)
 
-
-                return jsonify(data="Provided files encrypted!")
+                return jsonify(data="Provided files encrypted!", success=True)
             else:
-                return jsonify(error="Key not found!")        
-  
+                return jsonify(error="Key not found!", success=False)
 
-                  
-                          
-        except :
-             return jsonify(error= "An error occured!")
+        except:
+            return jsonify("An error occured!", success=False)
+
              
     def decryptFiles(self, request):
         try: 

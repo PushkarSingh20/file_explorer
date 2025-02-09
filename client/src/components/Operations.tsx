@@ -91,6 +91,19 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
 
     }
 
+    const HandleEncrypt = async () => {
+
+            if (selectedfiles.length === 0) {
+                    return
+            }
+
+
+            const response  = await Form_Mutation({ path: `http://localhost:5000/encryptfiles`, method: "POST" , data: {files: selectedfiles}})
+
+
+            console.log(response)
+    }
+
     return (
         selectedfiles.length > 0 ? <div className='flex items-center gap-[20px] w-full text-white w-max px-[20px]'>
             {type === "copy" ? (<div className='w-full flex items-center gap-[20px]'>
@@ -122,7 +135,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Eleme
 
                     <button title='move' onClick={() => HandleMoveCopy("move")} className='hover:bg-gray-500 opbtns'><DriveFileMoveOutlined sx={{ fontSize: 16 }} /></button>
 
-                    <button title='encrypt' className='hover:bg-gray-500 opbtns'><HttpsOutlined sx={{ fontSize: 16 }} /></button>
+                    <button title='encrypt' onClick={() => HandleEncrypt()} className='hover:bg-gray-500 opbtns'><HttpsOutlined sx={{ fontSize: 16 }} /></button>
                     <button title='decrypt' className='hover:bg-gray-500 opbtns'><NoEncryptionGmailerrorredOutlined sx={{ fontSize: 16 }} /></button>
                 </>)}
 

@@ -50,8 +50,6 @@ export default function App() {
   const [GetdataMutation] = useGetdataMutation()
 
   
-
-
   interface filesProps {
 
     partition_name: string,
@@ -226,7 +224,7 @@ export default function App() {
       <div className='flex flex-col gap-[10px] w-full h-full relative'>
 
         {state && dialogType === "rename" &&   <RenameDialog />}
-        
+
         {state && dialogType === "delete" && <DeleteDialog/>}
 
         <div className=' w-full flex items-center justify-between'>
