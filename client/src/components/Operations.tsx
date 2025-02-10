@@ -157,7 +157,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
                 <button onClick={() => CopyFiles()} disabled={(upathname === "this pc" || upathname === pathname) ? true : false} className={(pathname === "this pc" || upathname === pathname) ? "text-gray-500" : "text-white"} ><ColorizeOutlined sx={{ fontSize: 16 }} /></button>
                 <button title='cancel' onClick={() => CancleAction()} className='hover:bg-red-500 opbtns'><CancelOutlined /></button>
 
-
+                
 
             </div>
             ) : (type === "move" ? <div className='w-full flex items-center gap-[20px]'>
