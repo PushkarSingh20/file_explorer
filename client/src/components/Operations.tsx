@@ -8,18 +8,18 @@ import { setSelectedFiles, setType } from '../redux/selected/slice';
 import { setError } from '../redux/Errors/slice';
 import { useSeletedFiles } from '../hooks/useSelectedFiles';
 import { setDialogType, setState } from '../redux/Dialog/slice';
+import { setLoadingSlice } from '../redux/Loading/slice';
 
 interface Propdata {
 
     selectedfiles: string[],
     pathname: string,
-    setLoadingElem: any
 
 
 }
 
 
-export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingElem }): JSX.Element => {
+export const Operations: FC<Propdata> = ({ selectedfiles, pathname }): JSX.Element => {
 
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
     const [Form_Mutation] = useGetdataMutation();
@@ -32,7 +32,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
             return
         }
         const response = await Form_Mutation({ path: `http://localhost:5000/copy`, method: "PUT", data: { files: selectedfiles, destination: pathname } })
-        setLoadingElem(true)
+        dispatch(setLoadingSlice(true))
         if (!response.data.success) {
 
             dispatch(setError("Failed to copy!"))
@@ -45,7 +45,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
             Requestdata(`Files copied to ${pathname}!`, Form_Mutation, dispatch, pathname)
         }
 
-        setLoadingElem(false)
+        dispatch(setLoadingSlice(false))
     }
 
     const HandleMoveCopy = async (type: string) => {
@@ -74,7 +74,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
         if (selectedfiles.length === 0) {
             return
         }
-        setLoadingElem(true)
+        dispatch(setLoadingSlice(true))
         const response = await Form_Mutation({ path: `http://localhost:5000/move`, method: "PUT", data: { files: selectedfiles, destination: pathname } })
 
         if (!response.data.success) {
@@ -90,7 +90,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
 
 
         }
-        setLoadingElem(false)
+       dispatch(setLoadingSlice(false))
 
     }
 
@@ -100,7 +100,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
             return
         }
 
-        setLoadingElem(true)
+        dispatch(setLoadingSlice(true))
         const response = await Form_Mutation({ path: `http://localhost:5000/encryptfiles`, method: "POST", data: { files: selectedfiles } })
 
         if (response.data.success) {
@@ -119,7 +119,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
             dispatch(setType(null))
         }
 
-        setLoadingElem(false)
+        dispatch(setLoadingSlice(false))
     }
 
     const HandleDecrypt = async () => {
@@ -127,7 +127,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
             return
         }
 
-        setLoadingElem(true)
+        dispatch(setLoadingSlice(true))
         const response = await Form_Mutation({ path: `http://localhost:5000/decryptfiles`, method: "POST", data: { files: selectedfiles } })
 
         if (response.data.success) {
@@ -146,7 +146,7 @@ export const Operations: FC<Propdata> = ({ selectedfiles, pathname, setLoadingEl
             dispatch(setType(null))
         }
 
-        setLoadingElem(false)    
+        dispatch(setLoadingSlice(false) )
     }
 
     return (

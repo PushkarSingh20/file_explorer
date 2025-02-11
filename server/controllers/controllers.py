@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 from concurrent.futures import ThreadPoolExecutor
 import json
 import stat
+from redis_config import RedisObj
 
 ENCRYPTED_FILES_META = "encrypted_file.json"
 
@@ -73,7 +74,6 @@ class FIleExplorer:
             
             return  {"encryption_error" : True}
 
-
     def MainThreadFind(self, args):
         root, dir_name, file_name, search = args
         
@@ -124,13 +124,27 @@ class FIleExplorer:
             datatosend = []
 
             data = self.oslistdir(pathname["path"])
-            for i in data:
-                 if os.path.isdir(f"{pathname["path"]}/{i}"):
-                        
-                        datatosend.append({ "isdir": True , "name": i , "path": f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
-                 else:
-                       datatosend.append({ "isdir": False  , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": os.path.splitext(i)[-1]})
+    
+            redis_data = RedisObj.Redis_get(os.path.abspath(pathname["path"]))
             
+            if not redis_data["error"] and  redis_data["data"] != None:
+            
+                return jsonify(pathdata = redis_data["data"] , success= True , data="recived cached!")
+
+            for i in data:
+                 
+                if os.path.isdir(f"{pathname["path"]}/{i}"):
+                       
+                    datatosend.append({  "isdir": True , "name": i , "path": f"{pathname["path"]}/{i}" , "ext": f"{os.path.splitext(i)[-1]}"})
+                        
+                else:
+                    datatosend.append({ "isdir": False  , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": f"{os.path.splitext(i)[-1]}"})
+
+            setdata = RedisObj.Redis_set(os.path.abspath(pathname["path"]) , datatosend)
+
+            if not setdata:
+              print("Failed to cache data!")
+
             return jsonify(pathdata = datatosend , success= True)
         except:
             return jsonify(error="An error occured!" ,  success= False)

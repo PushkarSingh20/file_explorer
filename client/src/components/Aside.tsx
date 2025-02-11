@@ -16,6 +16,7 @@ import { setdata } from "../redux/Data/slice";
 import { setError } from "../redux/Errors/slice";
 import { Requestdata } from "../functions/Requestdata";
 import { useActivepath } from "../hooks/useUpaths";
+import { useLoadingState } from "../hooks/useLoading";
 
 const Aside = () => {
 
@@ -24,7 +25,7 @@ const Aside = () => {
     const [GetdataMutation] = useGetdataMutation()
     const { pathname } = useActivepath()
     const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
-
+    const {LoadingState} = useLoadingState()
     async function Datarequest(path: string, method: string, data: Object) {
 
 
@@ -144,8 +145,8 @@ const Aside = () => {
 
 
                 <div className="flex w-full items-center justify-between">
-
-                    <div>
+               {LoadingState ? <> </> :  <>
+                  <div>
 
                         <button onClick={() => dispatch(setactivepath("this pc"))}><HomeSharp className="text-white" /></button>
                         <button onClick={() => Refresh()} className="text-white"> <RefreshOutlined /></button>
@@ -158,6 +159,10 @@ const Aside = () => {
 
 
                     </div> : <></>}
+
+                </>}
+
+
                 </div>
 
                 {BasicFiles.map((value, index) => {

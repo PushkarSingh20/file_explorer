@@ -28,6 +28,8 @@ import { useError } from './hooks/useError'
 import { useMessage } from './hooks/useMessage'
 import DeleteDialog from './components/DeleteDialog'
 import LooksOutlinedIcon from '@mui/icons-material/LooksOutlined';
+import { useLoadingState } from './hooks/useLoading'
+
 
 export default function App() {
 
@@ -37,12 +39,12 @@ export default function App() {
 
   const { error: Error } = useError();
   const { message: Message } = useMessage();
-
+  const {LoadingState} = useLoadingState()
   const { dialogType, state } = useDialogState()
   const [PercentUsed, setPercentUsed] = useState<number[]>([])
 
   const { selectedfiles, type } = useSeletedFiles()
-  const [LoadingElem, setLoadingElem] = useState<Boolean>(false)
+
 
   const { data: username, isLoading: loadingusername, error: usernameerror } = useGetBaseQueryQuery("/getuser")
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
@@ -171,7 +173,7 @@ export default function App() {
   }
 
   const Handledrive = async (path: string) => {
-    if (LoadingElem) {
+    if (LoadingState) {
       return
     }
     let pathname = path.replace(/\\/g, "/")
@@ -198,7 +200,7 @@ export default function App() {
   const HandleSelectedFiles = (e: any, value: { path: string }) => {
 
     e.preventDefault()
-    if (e.key !== "s" || LoadingElem) {
+    if (e.key !== "s" || LoadingState) {
       return
     }
     let files: string[] = [...selectedfiles];
@@ -213,7 +215,7 @@ export default function App() {
   }
 
   const HandleIsChecked = (value: string) => {
-    if (LoadingElem) {
+    if (LoadingState) {
       return
     }
     let files: string[] = [...selectedfiles];
@@ -250,20 +252,23 @@ export default function App() {
 
       <div className='flex flex-col gap-[10px] w-full h-full relative'>
 
-        {state && dialogType === "rename" && <RenameDialog setLoadingElem={setLoadingElem} />}
+        {state && dialogType === "rename" && <RenameDialog  />}
 
-        {state && dialogType === "delete" && <DeleteDialog setLoadingElem={setLoadingElem} />}
+        {state && dialogType === "delete" && <DeleteDialog />}
 
         <div className=' w-full flex items-center justify-between p-[10px]'>
 
           {PathsetterState ?
          
 
-              <input type="text" className='bg-transparent rounded-lg text-white h-full outline-none w-full' onBlur={() => Pathsetter()} onChange={(e) => dispatch(setactivepath(e.target.value)) } value={pathname} />
+              <input type="text" className='bg-black text-sm p-[10px] rounded-lg w-[50%] rounded-lg text-white h-full outline-none ' onBlur={() => Pathsetter()} onChange={(e) => dispatch(setactivepath(e.target.value)) } value={pathname} />
 
-            : <button onDoubleClick={() => setPathsetterState(true)} className='p-[20px] text-white'>{pathname}</button>}
+            : <div className='flex items-center gap-[20px]'>
+              <button onDoubleClick={() => setPathsetterState(true)} className='p-[20px] text-white'>{pathname}</button>
+              <p className='text-gray-500 font-bold text-[13px]'>{Maindata.data.length}</p>
+            </div> }
 
-          {LoadingElem ? <></> : <Operations pathname={pathname} setLoadingElem={setLoadingElem} selectedfiles={selectedfiles} />}
+          {LoadingState ? <></> : <Operations pathname={pathname}  selectedfiles={selectedfiles} />}
 
         </div>
 
@@ -275,7 +280,7 @@ export default function App() {
           <p className='text-[12px] rounded-lg  w-[90%] p-[3px] flex bg-green-500'>{Message}</p>
         </motion.div>}
 
-        {LoadingElem ? <div className='flex items-center gap-[20px] justify-center w-full'>
+        {LoadingState ? <div className='flex items-center gap-[20px] justify-center w-full'>
           <motion.div animate={{ x: [-70, 0] }} transition={{ duration: 0.1, ease: "easeInOut" }} className=' rounded-lg  w-[90%] p-[3px] flex bg-yellow-500  items-center gap-[20px]'>
 
             <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}><LooksOutlinedIcon sx={{ fontSize: 13 }} /></motion.span>
@@ -328,15 +333,19 @@ export default function App() {
 
           {Maindata.data.map((value, index) => (
 
-            <div key={index} className='flex items-center '>
+            <div key={index} className='flex items-center'>
+
               {selectedfiles.includes(value["path"]) && <input type="checkbox" onChange={() => HandleIsChecked(value["path"])} checked={true} className='outline-none w-[15px] h-[15px]' />}
 
               <button onKeyDown={(e) => HandleSelectedFiles(e, value)} onDoubleClick={() => HandlePath(value["path"], dispatch, paths)} key={index} className='flex px-[20px] text-[13px] items-center gap-[20px]'>
 
                 {GiveFileIcon(value["ext"], value["isdir"])}
+             
 
                 <p className='text-slate-200'>{value["name"]} </p>
-
+                
+             
+            
 
               </button>
 
