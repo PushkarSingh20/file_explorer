@@ -196,7 +196,7 @@ export default function App() {
 
     }
   }
-
+  
   const HandleSelectedFiles = (e: any, value: { path: string }) => {
 
     e.preventDefault()

@@ -3,10 +3,12 @@ from flask import  jsonify
 import shutil
 import psutil
 from cryptography.fernet import Fernet
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor,  as_completed
 import json
 import stat
 from redis_config import RedisObj
+from threading import Lock
+
 
 ENCRYPTED_FILES_META = "encrypted_file.json"
 
@@ -14,6 +16,7 @@ class FIleExplorer:
 
     def __init__(self):
         self.partitions  =  psutil.disk_partitions()
+        self.lock = Lock() 
 
     def GenerateFilekey(self):
          
@@ -74,19 +77,7 @@ class FIleExplorer:
             
             return  {"encryption_error" : True}
 
-    def MainThreadFind(self, args):
-        root, dir_name, file_name, search = args
-        
-    
-        result = []
-        
-        if search in dir_name:
-            result.append({"dirname": dir_name , "root" : root  })
-            
-        if search in file_name:
-            result.append({"filename" : file_name , "root" : root})
-        
-        return result 
+
     
     def oslistdir(self, path):
         data = os.listdir(path)
@@ -130,7 +121,7 @@ class FIleExplorer:
             if not redis_data["error"] and  redis_data["data"] != None:
             
                 return jsonify(pathdata = redis_data["data"] , success= True , data="recived cached!")
-
+            
             for i in data:
                  
                 if os.path.isdir(f"{pathname["path"]}/{i}"):
@@ -233,40 +224,56 @@ class FIleExplorer:
             except:
                 return jsonify(error="An error occured!" , success=False)
  
-    def searchFiles(self , request):
-        try: 
-            data = request.get_json()
-            search = data["searched"]
-      
-            findings = []
+    def MainThreadFind(self, root, dir_name, file_name, search):
 
+        if search.lower() in root.lower() or search.lower() in file_name.lower() or search.lower() in dir_name.lower():
             
+            return [(root, dir_name, file_name)]
+        return []
 
-            for i in self.partitions:
+    def searchFiles(self, search , sid , socketio):
+        try:
+            
+          
+            
+           
+            def GetPartitions(partition):
+                count = 0
+                for root, dirs, files in os.walk(partition):
+                   
+                    args = [(root, dir_name, file_name, search) for dir_name in dirs for file_name in files]
 
-                    
-                
-                    for root, dirs, files in os.walk(i.mountpoint): 
-                            args = [(root, dir_name, file_name , search  ) for dir_name in dirs for file_name in files ]
+                    if count >= 500: 
+                        return  
 
-                            if len(findings) >= 500:
-                                break
-                            
-                            
-                            with ThreadPoolExecutor(max_workers=12) as exe:
-                                results = exe.map(self.MainThreadFind, args)
+                    with ThreadPoolExecutor(max_workers=12) as exe:
+                        results = exe.map(lambda arg: self.MainThreadFind(*arg), args)
+
+                        for result in results:
+                            if count >= 500:
+                                    return  
+                         
+                            if result:
                                 
-                                
-                                for result in results:
-                                    if len(findings) >= 500:
-                                        break
-                                    if result:
-                                        findings.extend(result) 
+                                count+=1
+                                with self.lock:
+                                  
+                                    socketio.emit("search_result" , json.dumps(result) , room=sid)
+                                    
+            
+            with ThreadPoolExecutor(max_workers=len(self.partitions)) as partition_executor:
+                futures = [partition_executor.submit(GetPartitions, os.path.abspath(i.mountpoint)) for i in self.partitions ]
 
-                                      
-            return jsonify(data=findings)
-        except:
-            return jsonify(error="An error occured")
+                for future in as_completed(futures):
+                    try:
+                        future.result()  
+                    except Exception as e:
+                        print(f"Error searching in a partition: {e}")
+
+           
+
+        except Exception as e:
+           socketio.emit("error" , json.dumps({  "message" : "Failed to search!" }))
 
     def encryptFiles(self, request):
         try: 

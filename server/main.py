@@ -3,11 +3,13 @@ from flask_cors import CORS
 from controllers.controllers import FileExp
 from redis_config import RedisObj
 
-
+from flask_socketio import SocketIO
 app = Flask(__name__)
 
 
 CORS(app , origins=["http://localhost:3000"])
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading" )
+
 RedisObj.Rediconnect()
 
 @app.route("/getuser")
@@ -27,8 +29,6 @@ def getpath():
 def Renamepath():
     return FileExp.renamepath(request)
 
-
-
  
 @app.route('/delete' , methods=["DELETE"])
 def delete():
@@ -44,10 +44,12 @@ def move():
     return FileExp.move(request)
     
 
-@app.route('/search' , methods=["POST"])
-def search():
-    return FileExp.searchFiles(request)
-
+@socketio.on("searchfiles")
+def search(data):
+    search = data["searched"]
+   
+    sid = request.sid 
+    socketio.start_background_task(FileExp.searchFiles, search, sid , socketio)
 
 
 @app.route('/encryptfiles' , methods=["POST"])
