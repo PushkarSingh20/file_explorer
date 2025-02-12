@@ -2,6 +2,7 @@ import { Dispatch } from "redux";
 import { setactivepath } from "../redux/upaths/activepath";
 import { setdata } from "../redux/Data/slice";
 import { setpaths , setactiveindex } from "../redux/upaths/slice";
+import { setLoadingSlice } from "../redux/Loading/slice";
 
 
 
@@ -34,7 +35,7 @@ export const HandlePath = async (
     const data = await response.json();
 
     if (data?.pathdata) {
-      
+      dispatch(setLoadingSlice(true))
       dispatch(setdata(data.pathdata));
       dispatch(setactivepath(!path.endsWith("/") ? path + "/" : path));
       
@@ -44,7 +45,7 @@ export const HandlePath = async (
         dispatch(setactiveindex(Number(pathdata.length) -1 ))
 
       }
-      
+      dispatch(setLoadingSlice(false))
     } else {
       console.warn("No path data received from the server.");
     }

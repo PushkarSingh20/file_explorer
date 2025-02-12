@@ -8,7 +8,7 @@ import json
 import stat
 from redis_config import RedisObj
 from threading import Lock
-
+import time
 
 ENCRYPTED_FILES_META = "encrypted_file.json"
 
@@ -228,36 +228,41 @@ class FIleExplorer:
 
         if search.lower() in root.lower() or search.lower() in file_name.lower() or search.lower() in dir_name.lower():
             
-            return [(root, dir_name, file_name)]
+            return [((root), dir_name, file_name)]
         return []
 
     def searchFiles(self, search , sid , socketio):
         try:
-            
-          
+         
             
            
             def GetPartitions(partition):
+
+                
+                starttime = time.time()
                 count = 0
                 for root, dirs, files in os.walk(partition):
-                   
+                    if time.time() - starttime > 10 :
+                     
+                        socketio.emit("time_out" ,  json.dumps({ "message" : "Time out!" }))
+                        break
                     args = [(root, dir_name, file_name, search) for dir_name in dirs for file_name in files]
 
-                    if count >= 500: 
+                    if count >= 100: 
                         return  
 
                     with ThreadPoolExecutor(max_workers=12) as exe:
                         results = exe.map(lambda arg: self.MainThreadFind(*arg), args)
 
                         for result in results:
-                            if count >= 500:
+                            if count >= 100:
                                     return  
                          
                             if result:
                                 
                                 count+=1
                                 with self.lock:
-                                  
+                             
                                     socketio.emit("search_result" , json.dumps(result) , room=sid)
                                     
             
@@ -369,8 +374,7 @@ class FIleExplorer:
             else:
                 return jsonify(error="Key not found!" , success=False)
             
-        except Exception as e:
-             print(e , "here")
+        except :
              return jsonify(error= "An error occured!" , success=False)
     
 FileExp = FIleExplorer()

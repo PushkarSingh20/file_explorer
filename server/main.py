@@ -47,7 +47,7 @@ def move():
 @socketio.on("searchfiles")
 def search(data):
     search = data["searched"]
-   
+    
     sid = request.sid 
     socketio.start_background_task(FileExp.searchFiles, search, sid , socketio)
 

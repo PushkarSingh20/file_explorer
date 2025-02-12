@@ -45,6 +45,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.15",
     "@types/react": "^19.0.4",
     "@types/react-dom": "^19.0.2",
     "electron": "^33.3.1",
