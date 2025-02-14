@@ -4,12 +4,12 @@ from controllers.controllers import FileExp
 from redis_config import RedisObj
 
 from flask_socketio import SocketIO
+
 app = Flask(__name__)
 
 
 CORS(app , origins=["http://localhost:3000"])
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading" )
-
 RedisObj.Rediconnect()
 
 @app.route("/getuser")

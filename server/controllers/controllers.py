@@ -110,7 +110,6 @@ class FIleExplorer:
     def get_directory(self, request):
 
         try:
-
             pathname = request.get_json()
             datatosend = []
 
@@ -123,13 +122,13 @@ class FIleExplorer:
                 return jsonify(pathdata = redis_data["data"] , success= True , data="recived cached!")
             
             for i in data:
-                 
-                if os.path.isdir(f"{pathname["path"]}/{i}"):
+                
+                if os.path.isdir(f"{pathname['path']}/{i}"):
                        
-                    datatosend.append({  "isdir": True , "name": i , "path": f"{pathname["path"]}/{i}" , "ext": f"{os.path.splitext(i)[-1]}"})
+                    datatosend.append({  "isdir": True , "name": i , "path": f"{pathname['path']}/{i}" , "ext": f"{os.path.splitext(i)[-1]}"})
                         
                 else:
-                    datatosend.append({ "isdir": False  , "name": i , "path" : f"{pathname["path"]}/{i}" , "ext": f"{os.path.splitext(i)[-1]}"})
+                    datatosend.append({ "isdir": False  , "name": i , "path" : f"{pathname['path']}/{i}" , "ext": f"{os.path.splitext(i)[-1]}"})
 
             setdata = RedisObj.Redis_set(os.path.abspath(pathname["path"]) , datatosend)
 
